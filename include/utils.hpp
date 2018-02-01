@@ -29,4 +29,8 @@ void normalizeCloud(pcl::PointCloud<pcl::PointXYZ> &cloud);
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals);
 
+void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
+		     pcl::PointCloud<pcl::Normal> &normals);
+
+void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ>& cloud, const std::vector<pcl::Vertices>& polygons, pcl::PointCloud<pcl::Normal>& normals);
 #endif
