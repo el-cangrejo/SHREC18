@@ -17,9 +17,6 @@ int main(int argc, char **argv)
   }
 
   std::cout << "Loaded " << mesh->cloud.data.size() << " data points" << std::endl;
-  std::cout << "Loaded " << mesh->cloud.data[0] << " data points" << std::endl;
-  std::cout << "Loaded " << mesh->cloud.data[1] << " data points" << std::endl;
-  std::cout << "Loaded " << mesh->cloud.data[2] << " data points" << std::endl;
 
 	//normalizeCloud(cloud);
 

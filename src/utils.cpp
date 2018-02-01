@@ -24,7 +24,7 @@ void fitToUnitCloud (pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud) {
 	float maxDist = 0.0;
 
 	for (int i = 0; i < cloud->points.size(); ++i) {
-		float dist = sqrt(pow(cloud->points[i].x, 2), pow(cloud->points[i].y, 2), pow(cloud->points[i].z, 2));
+		float dist = sqrt(pow(cloud->points[i].x, 2) + pow(cloud->points[i].y, 2) + pow(cloud->points[i].z, 2));
 
 		if (dist > maxDist)
 			maxDist = dist;
