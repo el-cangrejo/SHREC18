@@ -60,20 +60,20 @@ pcl::PointCloud<pcl::FPFHSignature33>::Ptr execute_featureEstimation(Cloud cloud
   return fpfhs;
 }
 
-void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> cloud, pcl::PointCloud<pcl::Normal> normals)
-{
-  pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
-  viewer.setBackgroundColor(0, 0, 0);
-  viewer.addPointCloud<pcl::PointXYZ>(cloud, "sample cloud");
-  viewer.setPointCloudRenderingProperties(
-      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
-  viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(cloud, normals, 10,
-							  0.05, "normals");
-  viewer.addCoordinateSystem(1.0);
-  viewer.initCameraParameters();
-  while (!viewer.wasStopped()) {
-    viewer.spinOnce(100);
-  }
-}
+//void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> cloud, pcl::PointCloud<pcl::Normal> normals)
+//{
+//  pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+//  viewer.setBackgroundColor(0, 0, 0);
+//  viewer.addPointCloud<pcl::PointXYZ>(cloud, "sample cloud");
+//  viewer.setPointCloudRenderingProperties(
+//      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
+//  viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(cloud, normals, 10,
+//							  0.05, "normals");
+//  viewer.addCoordinateSystem(1.0);
+//  viewer.initCameraParameters();
+//  while (!viewer.wasStopped()) {
+//    viewer.spinOnce(100);
+//  }
+//}
 
 
