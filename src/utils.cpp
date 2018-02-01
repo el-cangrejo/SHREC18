@@ -45,7 +45,7 @@ void fitToUnitCloud(pcl::PointCloud<pcl::PointXYZ> &cloud) {
 
 void normalizeCloud(pcl::PointCloud<pcl::PointXYZ> &cloud) {
 	centerCloud(cloud);
-	//fitToUnitCloud(cloud);
+	fitToUnitCloud(cloud);
 }
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,

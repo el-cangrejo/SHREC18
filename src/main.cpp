@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 
   std::cout << "Loaded query mesh with: " << mesh.cloud.data.size() << " data points" << std::endl;
 
-	normalizeCloud(cloud);
 	computeNormals(mesh, cloud, normals);
+	normalizeCloud(cloud);
   enterViewerLoop(cloud, normals);
 }
