@@ -124,3 +124,14 @@ void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 	pfh.setRadiusSearch(0.05);
 	pfh.compute(features);
 }
+
+float l2FeatureDistance(pcl::PFHSignature125 first,
+			pcl::PFHSignature125 second) {
+	float distance = 0.0;
+	int featureSize = 125;
+
+	for (int i = 0; i < featureSize; ++i)
+		distance += pow(first.histogram[i] - second.histogram[i], 2);
+
+	return sqrt(distance);
+}
