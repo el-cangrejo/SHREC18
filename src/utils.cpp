@@ -111,13 +111,15 @@ void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 	}
 }
 
-template <typename FeatureType>
+// template <typename FeatureType>
 void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
-		     pcl::PointCloud<FeatureType> &features) {
-	pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, FeatureType> pfh;
-	pfh.setInputCloud(cloud);
-	pfh.setInputNormals(normals);
+		     pcl::PointCloud<pcl::PFHSignature125> &features) {
+	// pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, FeatureType> pfh;
+	pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::PFHSignature125>
+	    pfh;
+	pfh.setInputCloud(cloud.makeShared());
+	pfh.setInputNormals(normals.makeShared());
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 	pfh.setSearchMethod(tree);

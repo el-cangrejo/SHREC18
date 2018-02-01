@@ -40,10 +40,9 @@ void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 				const std::vector<pcl::Vertices> &polygons,
 				pcl::PointCloud<pcl::Normal> &normals);
 
-template <typename FeatureType>
 void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
-		     pcl::PointCloud<pcl::FeatureType> &features);
+		     pcl::PointCloud<pcl::PFHSignature125> &features);
 
 float l2FeatureDistance(pcl::PFHSignature125 first,
 			pcl::PFHSignature125 second);
