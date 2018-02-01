@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
 	pcl::PolygonMesh mesh;
 
   std::string queryModel = "shrec18_recognition/Queries/2.ply";
-  std::string dataModel = "shrec18_recognition/Dataset/1.ply";
+  std::string dataModel = "shrec18_recognition/Dataset/3.ply";
 
   if (pcl::io::loadPLYFile(dataModel, mesh) == -1) {
     return -1;

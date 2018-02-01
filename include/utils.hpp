@@ -33,4 +33,7 @@ void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
 		     pcl::PointCloud<pcl::Normal> &normals);
 
 void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ>& cloud, const std::vector<pcl::Vertices>& polygons, pcl::PointCloud<pcl::Normal>& normals);
+
+float l2FeatureDistance (pcl::PFHSignature125 first, pcl::PFHSignature125 second);
+
 #endif
