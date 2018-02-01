@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
 	std::cout << "Loaded query mesh with: " << mesh.cloud.data.size()
 		  << " data points" << std::endl;
 
-	computeNormals(mesh, cloud, normals);
+	pcl::fromPCLPointCloud2(mesh.cloud, cloud);
 	normalizeCloud(cloud);
-	enterViewerLoop(cloud, normals);
+	computeNormals(mesh, cloud, normals);
+	enterViewerLoopMesh(mesh, normals);
 }
