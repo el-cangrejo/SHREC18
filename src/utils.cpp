@@ -1,10 +1,12 @@
 #include "utils.hpp"
 #include <pcl/conversions.h>
 
-void computeNormals(const pcl::PolygonMesh::Ptr &mesh,
-		    pcl::PointCloud<pcl::Normal>::Ptr &normals) {
-	//	pcl::features::computeApproximateNormals(mesh->cloud,
-	//mesh->polygons, normals);
+void computeNormals(const pcl::PolygonMesh &mesh,
+		    pcl::PointCloud<pcl::PointXYZ> &cloud,
+		    pcl::PointCloud<pcl::Normal> &normals) {
+	pcl::fromPCLPointCloud2(mesh->cloud, cloud);
+	pcl::features::computeApproximateNormals(cloud, mesh->polygons,
+						 normals);
 }
 
 void centerCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud) {
