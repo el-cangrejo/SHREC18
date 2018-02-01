@@ -21,5 +21,8 @@ int main(int argc, char **argv) {
 	pcl::fromPCLPointCloud2(mesh.cloud, cloud);
 	normalizeCloud(cloud);
 	computeNormals(mesh, cloud, normals);
+
+	pcl::PointCloud<pcl::PFHSignature125> features;
+	computeFeatures(cloud, normals, features);
 	enterViewerLoopMesh(mesh, normals);
 }
