@@ -1,3 +1,6 @@
+#ifndef UTILS_HPP
+#define UTILS_HPP
+
 #include <pcl/PolygonMesh.h>
 #include <pcl/common/centroid.h>
 #include <pcl/features/fpfh.h>
@@ -25,3 +28,5 @@ void normalizeCloud(pcl::PointCloud<pcl::PointXYZ> &cloud);
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals);
+
+#endif

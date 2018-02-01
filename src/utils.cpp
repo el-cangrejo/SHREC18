@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include <utils.hpp>
 #include <pcl/conversions.h>
 
 void computeNormals(const pcl::PolygonMesh &mesh,
@@ -17,6 +17,7 @@ void centerCloud(pcl::PointCloud<pcl::PointXYZ> &cloud) {
 	pcl::PointXYZ c;
 	centroid.get(c);
 
+	std::cout << "Centroid: " << c << "\n";
 	for (int i = 0; i < cloud.points.size(); ++i) {
 		cloud.points[i].x = cloud.points[i].x - c.x;
 		cloud.points[i].y = cloud.points[i].y - c.y;
@@ -44,18 +45,18 @@ void fitToUnitCloud(pcl::PointCloud<pcl::PointXYZ> &cloud) {
 
 void normalizeCloud(pcl::PointCloud<pcl::PointXYZ> &cloud) {
 	centerCloud(cloud);
-	fitToUnitCloud(cloud);
+	//fitToUnitCloud(cloud);
 }
 
-void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> cloud,
-		     pcl::PointCloud<pcl::Normal> normals) {
+void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
+		     pcl::PointCloud<pcl::Normal> &normals) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
-	viewer.addPointCloud<pcl::PointXYZ>(cloud, "sample cloud");
+	viewer.addPointCloud<pcl::PointXYZ>(cloud.makeShared(), "sample cloud");
 	viewer.setPointCloudRenderingProperties(
 	    pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
 	viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(
-	    cloud, normals, 10, 0.05, "normals");
+	    cloud.makeShared(), normals.makeShared(), 10, 0.05, "normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
 	while (!viewer.wasStopped()) {
