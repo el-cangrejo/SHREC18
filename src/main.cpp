@@ -5,8 +5,8 @@ int main(int argc, char **argv)
 {
   std::cout << "Hello SHREC2018!\n";
 
-  //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
 	pcl::PolygonMesh::Ptr mesh(new pcl::PolygonMesh);
 
   //std::string queryModel = "shrec18_recognition/Queries/2.ply";
