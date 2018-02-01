@@ -16,4 +16,4 @@ add_executable(SHREC18 ${SOURCES})
 
 target_link_libraries(SHREC18 ${PCL_LIBRARIES})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11")

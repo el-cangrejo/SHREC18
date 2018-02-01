@@ -5,6 +5,10 @@
 #include <pcl/point_types.h>
 #include <pcl/search/impl/search.hpp>
 #include <pcl/visualization/cloud_viewer.h>
+#include <pcl/common/centroid.h>
+#include <pcl/PolygonMesh.h>
+#include <pcl/features/from_meshes.h>
+//#include <pcl/features.h>
 
 #ifndef PCL_NO_PRECOMPILE
 #include <pcl/impl/instantiate.hpp>
@@ -27,6 +31,14 @@ execute_normalEstimation(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)
 
   return cloud_normals;
 }
+
+pcl::PointCloud<pcl::Normal>::Ptr computeNormals (const pcl::PolygonMesh::Ptr &mesh) {
+	pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
+
+	pcl::features::computeApproximateNormals(mesh->cloud, mesh->polygons, normals);
+}
+
+
 
 template <typename Cloud, typename CloudNormals>
 pcl::PointCloud<pcl::FPFHSignature33>::Ptr execute_featureEstimation(Cloud cloud, CloudNormals normals)
@@ -63,25 +75,44 @@ void enterViewerLoop(Cloud cloud, CloudNormals normals)
   }
 }
 
+void normalizeCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud) {
+	pcl::CentroidPoint<pcl::PointXYZ> centroid;	
+	for (int i = 0; i < cloud->points.size(); ++i) {
+		centroid.add(cloud->points[i]);
+	}
+	pcl::PointXYZ c;
+	centroid.get(c);
+
+	for (int i = 0; i < cloud->points.size(); ++i) {
+		cloud->points[i].x = cloud->points[i].x - c.x;
+		cloud->points[i].y = cloud->points[i].y - c.y;
+		cloud->points[i].z = cloud->points[i].z - c.z;
+	}
+}
+
 int main(int argc, char **argv)
 {
   std::cout << "Hello SHREC2018!\n";
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  //pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+
+	pcl::PolygonMesh::Ptr mesh(new pcl::PolygonMesh);
 
   std::string queryModel = "shrec18_recognition/Queries/2.ply";
   std::string dataModel = "shrec18_recognition/Dataset/2.ply";
-  if (pcl::io::loadPLYFile<pcl::PointXYZ>(queryModel, *cloud) == -1) {
-    PCL_ERROR("Couldn't read file test_pcd.pcd \n");
-    return (-1);
+  if (pcl::io::loadPLYFile(queryModel, *mesh) == -1) {
+    return -1;
   }
-  std::cout << "Loaded " << cloud->points.size() << " data points" << std::endl;
 
-  auto cloud_normals = execute_normalEstimation(cloud);
-  std::cout << "Computed " << cloud_normals->points.size() << " normals" << std::endl;
+  std::cout << "Loaded " << mesh->cloud.data.size() << " data points" << std::endl;
 
-  auto fpfhs = execute_featureEstimation(cloud, cloud_normals);
-  std::cout << "Computed " << fpfhs->points.size() << " features" << std::endl;
+	//normalizeCloud(cloud);
 
-  enterViewerLoop(cloud, cloud_normals);
+  //auto cloud_normals = execute_normalEstimation(cloud);
+  //std::cout << "Computed " << cloud_normals->points.size() << " normals" << std::endl;
+
+  //auto fpfhs = execute_featureEstimation(cloud, cloud_normals);
+  //std::cout << "Computed " << fpfhs->points.size() << " features" << std::endl;
+
+  //enterViewerLoop(cloud, cloud_normals);
 }
