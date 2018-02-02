@@ -72,8 +72,8 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 					       "sample cloud");
 	viewer.setPointCloudRenderingProperties(
 	    pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
-	viewer.addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal>(
-	    cloud.makeShared(), normals.makeShared(), 10, 0.05, "normals");
+//	viewer.addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal>(
+//	    cloud.makeShared(), normals.makeShared(), 10, 0.05, "normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
 	while (!viewer.wasStopped()) {
@@ -81,11 +81,13 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 	}
 }
 
-void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
+void enterViewerLoopMesh(pcl::PolygonMesh &mesh, pcl::PointCloud<pcl::PointXYZRGB> &cloudrgb,
 			 pcl::PointCloud<pcl::Normal> &normals) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
-	viewer.addPolygonMesh(mesh, "sample cloud");
+	viewer.addPolygonMesh(cloudrgb.makeShared(), mesh.polygons, "sample cloud");
+	//viewer.addPointCloud<pcl::PointXYZRGB>(cloudrgb.makeShared(),
+	//				       "rgb cloud");
 	//	viewer.setPointCloudRenderingProperties(
 	//	    pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample
 	// cloud");

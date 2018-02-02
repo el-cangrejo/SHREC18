@@ -36,7 +36,7 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals);
 
-void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
+void enterViewerLoopMesh(pcl::PolygonMesh &mesh, pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 			 pcl::PointCloud<pcl::Normal> &normals);
 
 void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ> &cloud,

@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 		  << " data points" << std::endl;
 
 	pcl::fromPCLPointCloud2(mesh.cloud, cloud);
-	normalizeCloud(cloud);
+	//normalizeCloud(cloud);
 	computeNormals(mesh, cloud, normals);
 
 	pcl::PointCloud<pcl::PFHSignature125> features;
@@ -28,5 +28,5 @@ int main(int argc, char **argv) {
 	computeFeatureDistancesFromTarget(features, 0, distances);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
 	createRGBCloud(cloud, distances, rgbCloud);
-	enterViewerLoop(rgbCloud, normals);
+	enterViewerLoopMesh(mesh, rgbCloud, normals);
 }
