@@ -23,10 +23,14 @@ int main(int argc, char **argv) {
 	computeNormals(mesh, cloud, normals);
 
 	pcl::PointCloud<pcl::PFHSignature125> features;
-	computeFeatures(cloud, normals, features);
+	float searchRadius = 0.12;
+	computeFeatures(cloud, normals, features, searchRadius);
 	std::vector<float> distances;
-	computeFeatureDistancesFromTarget(features, 0, distances);
+	int targetPointIndex = 1000;
+	pcl::PointXYZ target = cloud[targetPointIndex];
+	computeFeatureDistancesFromTarget(features, targetPointIndex,
+					  distances);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
 	createRGBCloud(cloud, distances, rgbCloud);
-	enterViewerLoop(rgbCloud, normals);
+	enterViewerLoop(rgbCloud, normals, target, searchRadius);
 }
