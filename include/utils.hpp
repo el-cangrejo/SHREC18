@@ -33,6 +33,9 @@ void normalizeCloud(pcl::PointCloud<pcl::PointXYZ> &cloud);
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals);
 
+void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
+		     pcl::PointCloud<pcl::Normal> &normals);
+
 void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
 			 pcl::PointCloud<pcl::Normal> &normals);
 
@@ -48,4 +51,5 @@ void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 float l2FeatureDistance(pcl::PFHSignature125 first,
 			pcl::PFHSignature125 second);
 
+void computeFeatureDistancesFromTarget(pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex, std::vector<float> &distances);
 #endif
