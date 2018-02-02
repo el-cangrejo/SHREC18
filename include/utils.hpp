@@ -51,5 +51,11 @@ void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 float l2FeatureDistance(pcl::PFHSignature125 first,
 			pcl::PFHSignature125 second);
 
-void computeFeatureDistancesFromTarget(pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex, std::vector<float> &distances);
+void computeFeatureDistancesFromTarget(
+    pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex,
+    std::vector<float> &distances);
+
+void createRGBCloud(const pcl::PointCloud<pcl::PointXYZ> &input,
+		    std::vector<float> distances,
+		    pcl::PointCloud<pcl::PointXYZRGB> &output);
 #endif

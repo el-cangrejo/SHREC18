@@ -185,7 +185,7 @@ void computeFeatureDistancesFromTarget(
 	}
 }
 
-void createRGBCloud(const pcl::PointCloud<pcl::PointXYZ> &inputCloud,
+void createRGBCloud(const pcl::PointCloud<pcl::PointXYZ> &input,
 		    std::vector<float> distances,
 		    pcl::PointCloud<pcl::PointXYZRGB> &output) {
 	auto minMax_iter =
@@ -193,7 +193,7 @@ void createRGBCloud(const pcl::PointCloud<pcl::PointXYZ> &inputCloud,
 	float minDistance = distances[minMax_iter.first - distances.begin()];
 	float maxDistance = distances[minMax_iter.second - distances.begin()];
 	float distancesRange = maxDistance - minDistance;
-	output += inputCloud;
+	pcl::copyPointCloud(input, output);
 	for (int i = 0; i < distances.size(); i++) {
 		float redValue = 255 * distances[i] / distancesRange;
 		output[i].r = redValue;

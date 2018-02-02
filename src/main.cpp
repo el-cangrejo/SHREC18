@@ -24,5 +24,9 @@ int main(int argc, char **argv) {
 
 	pcl::PointCloud<pcl::PFHSignature125> features;
 	computeFeatures(cloud, normals, features);
-	enterViewerLoopMesh(mesh, normals);
+	std::vector<float> distances;
+	computeFeatureDistancesFromTarget(features, 0, distances);
+	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
+	createRGBCloud(cloud, distances, rgbCloud);
+	enterViewerLoop(rgbCloud, normals);
 }
