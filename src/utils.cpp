@@ -64,6 +64,22 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 	}
 }
 
+void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
+		     pcl::PointCloud<pcl::Normal> &normals) {
+	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+	viewer.setBackgroundColor(0, 0, 0);
+	viewer.addPointCloud<pcl::PointXYZRGB>(cloud.makeShared(), "sample cloud");
+	viewer.setPointCloudRenderingProperties(
+	    pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
+	viewer.addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal>(
+	    cloud.makeShared(), normals.makeShared(), 10, 0.05, "normals");
+	viewer.addCoordinateSystem(1.0);
+	viewer.initCameraParameters();
+	while (!viewer.wasStopped()) {
+		viewer.spinOnce(100);
+	}
+}
+
 void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
 		     pcl::PointCloud<pcl::Normal> &normals) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
@@ -156,8 +172,8 @@ float l2FeatureDistance(pcl::PFHSignature125 first,
 	return sqrt(distance);
 }
 
-void computeFeatureDistancesFromTarget(pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex, std::vector<float> distances) {
-	const float targetFeatureValue=pfh.points[idx]; 
+void computeFeatureDistancesFromTarget(pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex, std::vector<float> &distances) {
+	const pcl::PFHSignature125 targetFeatureValue=pfh.points[targetIndex]; 
 	for (int i = 0; i < pfh.points.size(); ++i) {
 		float dist = l2FeatureDistance(targetFeatureValue, pfh.points[i]);
 		distances.push_back(dist);
