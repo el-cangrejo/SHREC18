@@ -155,3 +155,13 @@ float l2FeatureDistance(pcl::PFHSignature125 first,
 
 	return sqrt(distance);
 }
+
+void computeFeatureDistancesFromTarget(pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex, std::vector<float> distances) {
+	const float targetFeatureValue=pfh.points[idx]; 
+	for (int i = 0; i < pfh.points.size(); ++i) {
+		float dist = l2FeatureDistance(targetFeatureValue, pfh.points[i]);
+		distances.push_back(dist);
+	}
+}
+
+
