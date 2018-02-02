@@ -65,12 +65,13 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 }
 
 void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
-		     pcl::PointCloud<pcl::Normal> &normals) {
+			 pcl::PointCloud<pcl::Normal> &normals) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
 	viewer.addPolygonMesh(mesh, "sample cloud");
-//	viewer.setPointCloudRenderingProperties(
-//	    pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
+	//	viewer.setPointCloudRenderingProperties(
+	//	    pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample
+	//cloud");
 	pcl::PointCloud<pcl::PointXYZ> cloud;
 	pcl::fromPCLPointCloud2(mesh.cloud, cloud);
 	viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(
@@ -156,12 +157,30 @@ float l2FeatureDistance(pcl::PFHSignature125 first,
 	return sqrt(distance);
 }
 
-void computeFeatureDistancesFromTarget(pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex, std::vector<float> distances) {
-	const float targetFeatureValue=pfh.points[idx]; 
+void computeFeatureDistancesFromTarget(
+    pcl::PointCloud<pcl::PFHSignature125> pfh, int targetIndex,
+    std::vector<float> distances) {
+	const float targetFeatureValue = pfh.points[idx];
 	for (int i = 0; i < pfh.points.size(); ++i) {
-		float dist = l2FeatureDistance(targetFeatureValue, pfh.points[i]);
+		float dist =
+		    l2FeatureDistance(targetFeatureValue, pfh.points[i]);
 		distances.push_back(dist);
 	}
 }
 
-
+void createRGBCloud(const pcl::PointCloud<pcl::PointXYZ> &inputCloud,
+		    std::vector<float> distances,
+		    pcl::PointCloud<pcl::PointXYZRGB> &output) {
+	auto minMax_iter =
+	    std::minmax_element(distances.begin(), distances.end());
+	float minDistance = distances[minMax_iter.first - distances.begin()];
+	float maxDistance = distances[minMax_iter.second - distances.begin()];
+	float distancesRange = maxDistance - minDistance;
+	output += inputCloud;
+	for (int i = 0; i < distances.size(); i++) {
+		float redValue = 255 * distances[i] / distancesRange;
+		output[i].r = redValue;
+		output[i].g = 0;
+		output[i].b = 0;
+	}
+}
