@@ -64,6 +64,24 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 	}
 }
 
+void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
+		     pcl::PointCloud<pcl::Normal> &normals) {
+	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+	viewer.setBackgroundColor(0, 0, 0);
+	viewer.addPolygonMesh(mesh, "sample cloud");
+//	viewer.setPointCloudRenderingProperties(
+//	    pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
+	pcl::PointCloud<pcl::PointXYZ> cloud;
+	pcl::fromPCLPointCloud2(mesh.cloud, cloud);
+	viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(
+	    cloud.makeShared(), normals.makeShared(), 1, 0.05, "normals");
+	viewer.addCoordinateSystem(1.0);
+	viewer.initCameraParameters();
+	while (!viewer.wasStopped()) {
+		viewer.spinOnce(100);
+	}
+}
+
 void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 				const std::vector<pcl::Vertices> &polygons,
 				pcl::PointCloud<pcl::Normal> &normals) {
