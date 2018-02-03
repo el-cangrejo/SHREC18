@@ -152,6 +152,7 @@ void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 }
 
 // template <typename FeatureType>
+<<<<<<< HEAD
 void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
 		     pcl::PointCloud<pcl::PFHSignature125> &features,
@@ -227,6 +228,9 @@ float l2FeatureDistance(pcl::FPFHSignature33 first,
 
 	return sqrt(distance);
 }
+=======
+
+>>>>>>> 61deec2d7ba0c2145f8ccb76d589911869a688b3
 
 
 void createRGBCloud(const pcl::PointCloud<pcl::PointXYZ> &input,

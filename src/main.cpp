@@ -1,5 +1,6 @@
 #include <iostream>
 #include <utils.hpp>
+#include "comparison.h"
 
 int main(int argc, char **argv) {
 	std::cout << "Hello SHREC2018!\n";
@@ -8,18 +9,15 @@ int main(int argc, char **argv) {
 	pcl::PointCloud<pcl::PointXYZ> queryCloud;
 	pcl::PointCloud<pcl::Normal> queryNormals;
 	pcl::PolygonMesh queryMesh;
-	pcl::PointCloud<pcl::FPFHSignature33> queryFeatures;
 
 	std::string targetModel = "shrec18_recognition/Dataset/1.ply";
 	pcl::PointCloud<pcl::PointXYZ> targetCloud;
 	pcl::PointCloud<pcl::Normal> targetNormals;
 	pcl::PolygonMesh targetMesh;
-	pcl::PointCloud<pcl::FPFHSignature33> targetFeatures;
 
-
+	//comparison parameters
 	float searchRadius = 0.12;
 	int targetPointIndex = 2000;
-	std::vector<float> distances;
 
 	if (pcl::io::loadPLYFile(queryModel, queryMesh) == -1) {
 		return -1;
@@ -30,14 +28,16 @@ int main(int argc, char **argv) {
 
 	pcl::fromPCLPointCloud2(queryMesh.cloud, queryCloud);
 	computeNormals(queryMesh, queryCloud, queryNormals);
-	computeFeatures(queryCloud, queryNormals, queryFeatures, searchRadius);
+	CloudWithNormals queryCloudWithNormals(queryCloud,queryNormals);
+	auto  queryFeatures=computeFeatures_PFH(queryCloudWithNormals, searchRadius);
 
 	pcl::fromPCLPointCloud2(targetMesh.cloud, targetCloud);
 	computeNormals(targetMesh, targetCloud, targetNormals);
-	computeFeatures(targetCloud, targetNormals, targetFeatures, searchRadius);
+	CloudWithNormals targetCloudWithNormals(targetCloud,targetNormals);
+	auto  targetFeatures=computeFeatures_PFH(targetCloudWithNormals, searchRadius);
 
 
-	computeFeatureDistancesFromTargetModel<pcl::FPFHSignature33>(targetFeatures, queryFeatures[targetPointIndex], distances);
+	std::vector<float> distances=computeFeatureDistancesFromTargetModel(targetFeatures, queryFeatures[targetPointIndex]);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
 	createRGBCloud(targetCloud, distances, rgbCloud);
 
