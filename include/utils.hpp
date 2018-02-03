@@ -34,7 +34,8 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals);
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
-		     pcl::PointCloud<pcl::Normal> &normals);
+		     pcl::PointCloud<pcl::Normal> &normals,
+		     pcl::PointXYZ sphereCenter, float sphereRadius);
 
 void enterViewerLoopMesh(pcl::PolygonMesh &mesh, pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 			 pcl::PointCloud<pcl::Normal> &normals);
@@ -46,7 +47,8 @@ void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 // template <typename FeatureType>
 void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
-		     pcl::PointCloud<pcl::PFHSignature125> &features);
+		     pcl::PointCloud<pcl::PFHSignature125> &features,
+		     float searchRadius);
 
 float l2FeatureDistance(pcl::PFHSignature125 first,
 			pcl::PFHSignature125 second);

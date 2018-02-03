@@ -65,7 +65,8 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 }
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
-		     pcl::PointCloud<pcl::Normal> &normals) {
+		     pcl::PointCloud<pcl::Normal> &normals,
+		     pcl::PointXYZ sphereCenter, float sphereRadius) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
 	viewer.addPointCloud<pcl::PointXYZRGB>(cloud.makeShared(),
@@ -76,6 +77,7 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 //	    cloud.makeShared(), normals.makeShared(), 10, 0.05, "normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
+	viewer.addSphere(sphereCenter, sphereRadius, 0.0, 1.0, 0.0, "sphere");
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce(100);
 	}
@@ -85,7 +87,7 @@ void enterViewerLoopMesh(pcl::PolygonMesh &mesh, pcl::PointCloud<pcl::PointXYZRG
 			 pcl::PointCloud<pcl::Normal> &normals) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
-	viewer.addPolygonMesh(cloudrgb.makeShared(), mesh.polygons, "sample cloud");
+	//viewer.addPolygonMesh(cloudrgb.makeShared(), mesh.polygons, "sample cloud");
 	//viewer.addPointCloud<pcl::PointXYZRGB>(cloudrgb.makeShared(),
 	//				       "rgb cloud");
 	//	viewer.setPointCloudRenderingProperties(
@@ -152,7 +154,8 @@ void computeApproximateNormals_(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 // template <typename FeatureType>
 void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
-		     pcl::PointCloud<pcl::PFHSignature125> &features) {
+		     pcl::PointCloud<pcl::PFHSignature125> &features,
+		     float searchRadius) {
 	// pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, FeatureType> pfh;
 	pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::PFHSignature125>
 	    pfh;
@@ -161,7 +164,8 @@ void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 	pfh.setSearchMethod(tree);
-	pfh.setRadiusSearch(0.05);
+	//pfh.setRadiusSearch(searchRadius);
+	pfh.setKSearch(100);
 	pfh.compute(features);
 }
 

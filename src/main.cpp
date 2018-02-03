@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
 	pcl::PointCloud<pcl::Normal> normals;
 	pcl::PolygonMesh mesh;
 
-	std::string queryModel = "shrec18_recognition/Queries/2.ply";
+	std::string queryModel = "shrec18_recognition/Queries/5.ply";
 	// std::string dataModel = "shrec18_recognition/Dataset/1.ply";
 
 	if (pcl::io::loadPLYFile(queryModel, mesh) == -1) {
@@ -23,10 +23,15 @@ int main(int argc, char **argv) {
 	computeNormals(mesh, cloud, normals);
 
 	pcl::PointCloud<pcl::PFHSignature125> features;
-	computeFeatures(cloud, normals, features);
+	float searchRadius = 0.12;
+	computeFeatures(cloud, normals, features, searchRadius);
 	std::vector<float> distances;
-	computeFeatureDistancesFromTarget(features, 0, distances);
+	int targetPointIndex = 3000;
+	pcl::PointXYZ target = cloud[targetPointIndex];
+	computeFeatureDistancesFromTarget(features, targetPointIndex,
+					  distances);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
 	createRGBCloud(cloud, distances, rgbCloud);
-	enterViewerLoopMesh(mesh, rgbCloud, normals);
+//	enterViewerLoopMesh(mesh, rgbCloud, normals);
+	enterViewerLoop(rgbCloud, normals, target, searchRadius);
 }
