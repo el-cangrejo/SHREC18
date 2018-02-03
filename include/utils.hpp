@@ -14,6 +14,7 @@
 
 // feature eastimation
 #include <pcl/features/pfh.h>
+#include <pcl/features/shot.h>
 #include <pcl/point_types.h>
 
 #ifndef PCL_NO_PRECOMPILE
@@ -55,6 +56,14 @@ void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::FPFHSignature33> &features,
 		     float searchRadius);
 
+void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
+		     pcl::PointCloud<pcl::Normal> &normals,
+		     pcl::PointCloud<pcl::SHOT352> &features,
+		     float searchRadius);
+
+float l2FeatureDistance(pcl::SHOT352 first,
+			pcl::SHOT352 second);
+
 float l2FeatureDistance(pcl::PFHSignature125 first,
 			pcl::PFHSignature125 second);
 
@@ -69,6 +78,17 @@ void computeFeatureDistancesFromTarget(
 	for (int i = 0; i < pfh.points.size(); ++i) {
 		float dist =
 		    l2FeatureDistance(targetFeatureValue, pfh.points[i]);
+		distances.push_back(dist);
+	}
+}
+
+template <typename F>
+void computeFeatureDistancesFromTargetModel(
+    pcl::PointCloud<F> targetFeatures, F queryFeature,
+    std::vector<float> &distances) {
+	for (int i = 0; i < targetFeatures.points.size(); ++i) {
+		float dist =
+		    l2FeatureDistance(queryFeature, targetFeatures.points[i]);
 		distances.push_back(dist);
 	}
 }

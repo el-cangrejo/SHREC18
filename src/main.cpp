@@ -4,34 +4,42 @@
 int main(int argc, char **argv) {
 	std::cout << "Hello SHREC2018!\n";
 
-	pcl::PointCloud<pcl::PointXYZ> cloud;
-	pcl::PointCloud<pcl::Normal> normals;
-	pcl::PolygonMesh mesh;
+	std::string queryModel = "shrec18_recognition/Queries/3.ply";
+	pcl::PointCloud<pcl::PointXYZ> queryCloud;
+	pcl::PointCloud<pcl::Normal> queryNormals;
+	pcl::PolygonMesh queryMesh;
+	pcl::PointCloud<pcl::FPFHSignature33> queryFeatures;
 
-	std::string queryModel = "shrec18_recognition/Queries/5.ply";
-	// std::string dataModel = "shrec18_recognition/Dataset/1.ply";
+	std::string targetModel = "shrec18_recognition/Dataset/1.ply";
+	pcl::PointCloud<pcl::PointXYZ> targetCloud;
+	pcl::PointCloud<pcl::Normal> targetNormals;
+	pcl::PolygonMesh targetMesh;
+	pcl::PointCloud<pcl::FPFHSignature33> targetFeatures;
 
-	if (pcl::io::loadPLYFile(queryModel, mesh) == -1) {
+
+	float searchRadius = 0.12;
+	int targetPointIndex = 2000;
+	std::vector<float> distances;
+
+	if (pcl::io::loadPLYFile(queryModel, queryMesh) == -1) {
+		return -1;
+	}
+	if (pcl::io::loadPLYFile(targetModel, targetMesh) == -1) {
 		return -1;
 	}
 
-	std::cout << "Loaded query mesh with: " << mesh.cloud.data.size()
-		  << " data points" << std::endl;
+	pcl::fromPCLPointCloud2(queryMesh.cloud, queryCloud);
+	computeNormals(queryMesh, queryCloud, queryNormals);
+	computeFeatures(queryCloud, queryNormals, queryFeatures, searchRadius);
 
-	pcl::fromPCLPointCloud2(mesh.cloud, cloud);
-	//normalizeCloud(cloud);
-	computeNormals(mesh, cloud, normals);
+	pcl::fromPCLPointCloud2(targetMesh.cloud, targetCloud);
+	computeNormals(targetMesh, targetCloud, targetNormals);
+	computeFeatures(targetCloud, targetNormals, targetFeatures, searchRadius);
 
-	pcl::PointCloud<pcl::PFHSignature125> features;
-	float searchRadius = 0.12;
-	computeFeatures(cloud, normals, features, searchRadius);
-	std::vector<float> distances;
-	int targetPointIndex = 3000;
-	pcl::PointXYZ target = cloud[targetPointIndex];
-	computeFeatureDistancesFromTarget<pcl::PFHSignature125>(features, targetPointIndex,
-					  distances);
+
+	computeFeatureDistancesFromTargetModel<pcl::FPFHSignature33>(targetFeatures, queryFeatures[targetPointIndex], distances);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
-	createRGBCloud(cloud, distances, rgbCloud);
-//	enterViewerLoopMesh(mesh, rgbCloud, normals);
-	enterViewerLoop(rgbCloud, normals, target, searchRadius);
+	createRGBCloud(targetCloud, distances, rgbCloud);
+
+	enterViewerLoop(rgbCloud, targetNormals, targetCloud.points[0], searchRadius);
 }
