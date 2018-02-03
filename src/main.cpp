@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	pcl::PointCloud<pcl::Normal> targetNormals;
 	pcl::PolygonMesh targetMesh;
 
-	//comparison parameters
+	// comparison parameters
 	float searchRadius = 0.12;
 	int targetPointIndex = 2000;
 
@@ -28,18 +28,22 @@ int main(int argc, char **argv) {
 
 	pcl::fromPCLPointCloud2(queryMesh.cloud, queryCloud);
 	computeNormals(queryMesh, queryCloud, queryNormals);
-	CloudWithNormals queryCloudWithNormals(queryCloud,queryNormals);
-	auto  queryFeatures=computeFeatures_PFH(queryCloudWithNormals, searchRadius);
+	CloudWithNormals queryCloudWithNormals(queryCloud, queryNormals);
+	auto queryFeatures =
+	    computeFeatures_PFH(queryCloudWithNormals, searchRadius);
 
 	pcl::fromPCLPointCloud2(targetMesh.cloud, targetCloud);
 	computeNormals(targetMesh, targetCloud, targetNormals);
-	CloudWithNormals targetCloudWithNormals(targetCloud,targetNormals);
-	auto  targetFeatures=computeFeatures_PFH(targetCloudWithNormals, searchRadius);
+	CloudWithNormals targetCloudWithNormals(targetCloud, targetNormals);
+	auto targetFeatures =
+	    computeFeatures_PFH(targetCloudWithNormals, searchRadius);
 
-
-	std::vector<float> distances=computeFeatureDistancesFromTargetModel(targetFeatures, queryFeatures[targetPointIndex]);
+	int featureSize = 125;
+	std::vector<float> distances = computeFeatureDistancesFromTargetModel(
+	    targetFeatures, queryFeatures[targetPointIndex], featureSize);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
 	createRGBCloud(targetCloud, distances, rgbCloud);
 
-	enterViewerLoop(rgbCloud, targetNormals, targetCloud.points[0], searchRadius);
+	enterViewerLoop(rgbCloud, targetNormals, targetCloud.points[0],
+			searchRadius);
 }

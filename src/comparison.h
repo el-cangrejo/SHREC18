@@ -41,25 +41,27 @@ pcl::PointCloud<pcl::FPFHSignature33> computeFeatures_FPFH(
 	return outputFeatures;
 }
 
-float l2FeatureDistance(pcl::PFHSignature125 first,
-			pcl::PFHSignature125 second) {
+// pcl::PointCloud<pcl::SHOT352> computeFeatures_SHOT352(
+//     const CloudWithNormals input, float searchRadius) {
+// 	pcl::SHOTEstimation<pcl::PointXYZ, pcl::Normal, pcl::SHOT352> fpfh;
+// 	fpfh.setInputCloud(input.cloudPositions.makeShared());
+// 	fpfh.setInputNormals(input.cloudNormals.makeShared());
+// 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
+// 	    new pcl::search::KdTree<pcl::PointXYZ>());
+// 	fpfh.setSearchMethod(tree);
+// 	fpfh.setRadiusSearch(0.3);
+// 	pcl::PointCloud<pcl::SHOT352> outputFeatures;
+// 	fpfh.compute(outputFeatures);
+// 	return outputFeatures;
+// }
+
+template <typename FeatureType, typename FeatureSize>
+float l2FeatureDistance(FeatureType first, FeatureType second,
+			FeatureSize featureSize) {
 	float distance = 0.0;
-	int featureSize = 125;
 
 	for (int i = 0; i < featureSize; ++i)
 		distance += pow(first.histogram[i] - second.histogram[i], 2);
-
-	return sqrt(distance);
-}
-
-float l2FeatureDistance(pcl::FPFHSignature33 first,
-			pcl::FPFHSignature33 second) {
-	float distance = 0.0;
-	int featureSize = 33;
-
-	for (int i = 0; i < featureSize; ++i)
-		distance += pow(first.histogram[i] - second.histogram[i], 2);
-
 	return sqrt(distance);
 }
 
@@ -76,15 +78,14 @@ std::vector<float> selfFeatureDistance(
 	return distances;
 }
 
-
-template <typename FeatureType>
+template <typename FeatureType, typename FeatureSize>
 std::vector<float> computeFeatureDistancesFromTargetModel(
-    pcl::PointCloud<FeatureType> targetFeatures, FeatureType queryFeature
-    ) {
-std::vector<float> outputDistances;
+    pcl::PointCloud<FeatureType> targetFeatures, FeatureType queryFeature,
+    FeatureSize featureSize) {
+	std::vector<float> outputDistances;
 	for (int i = 0; i < targetFeatures.points.size(); ++i) {
-		float dist =
-		    l2FeatureDistance(queryFeature, targetFeatures.points[i]);
+		float dist = l2FeatureDistance(
+		    queryFeature, targetFeatures.points[i], featureSize);
 		outputDistances.push_back(dist);
 	}
 	return outputDistances;
