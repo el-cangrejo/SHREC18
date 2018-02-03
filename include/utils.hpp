@@ -50,8 +50,16 @@ void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::PFHSignature125> &features,
 		     float searchRadius);
 
+void computeFeatures(const pcl::PointCloud<pcl::PointXYZ> &cloud,
+		     pcl::PointCloud<pcl::Normal> &normals,
+		     pcl::PointCloud<pcl::FPFHSignature33> &features,
+		     float searchRadius);
+
 float l2FeatureDistance(pcl::PFHSignature125 first,
 			pcl::PFHSignature125 second);
+
+float l2FeatureDistance(pcl::FPFHSignature33 first,
+			pcl::FPFHSignature33 second);
 
 template <typename F>
 void computeFeatureDistancesFromTarget(
