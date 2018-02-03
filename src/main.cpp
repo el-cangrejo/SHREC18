@@ -1,5 +1,6 @@
 #include <iostream>
 #include <utils.hpp>
+#include "comparison.h"
 
 int main(int argc, char **argv) {
 	std::cout << "Hello SHREC2018!\n";
@@ -19,19 +20,19 @@ int main(int argc, char **argv) {
 		  << " data points" << std::endl;
 
 	pcl::fromPCLPointCloud2(mesh.cloud, cloud);
-	//normalizeCloud(cloud);
+	// normalizeCloud(cloud);
 	computeNormals(mesh, cloud, normals);
 
-	pcl::PointCloud<pcl::PFHSignature125> features;
 	float searchRadius = 0.12;
-	computeFeatures(cloud, normals, features, searchRadius);
-	std::vector<float> distances;
+	CloudWithNormals cloudWithNormals(cloud, normals);
+	auto features = computeFeatures_PFH(cloudWithNormals, searchRadius);
 	int targetPointIndex = 3000;
 	pcl::PointXYZ target = cloud[targetPointIndex];
-	computeFeatureDistancesFromTarget<pcl::PFHSignature125>(features, targetPointIndex,
-					  distances);
+	std::vector<float> distances =
+	    selfFeatureDistance<pcl::PFHSignature125>(features,
+						      targetPointIndex);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
 	createRGBCloud(cloud, distances, rgbCloud);
-//	enterViewerLoopMesh(mesh, rgbCloud, normals);
+	//	enterViewerLoopMesh(mesh, rgbCloud, normals);
 	enterViewerLoop(rgbCloud, normals, target, searchRadius);
 }
