@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	std::vector<float> distances;
 	int targetPointIndex = 3000;
 	pcl::PointXYZ target = cloud[targetPointIndex];
-	computeFeatureDistancesFromTarget(features, targetPointIndex,
+	computeFeatureDistancesFromTarget<pcl::PFHSignature125>(features, targetPointIndex,
 					  distances);
 	pcl::PointCloud<pcl::PointXYZRGB> rgbCloud;
 	createRGBCloud(cloud, distances, rgbCloud);
