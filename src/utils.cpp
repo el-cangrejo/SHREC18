@@ -1,5 +1,6 @@
 #include <pcl/conversions.h>
 #include <utils.hpp>
+#include <pcl/features/shot.h>
 
 void computeNormals(const pcl::PolygonMesh &mesh,
 		    pcl::PointCloud<pcl::PointXYZ> &cloud,
@@ -49,7 +50,7 @@ void normalizeCloud(pcl::PointCloud<pcl::PointXYZ> &cloud) {
 }
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
-		     pcl::PointCloud<pcl::Normal> &normals) {
+		     pcl::PointCloud<pcl::Normal> &normals, pcl::PointXYZ sphereCenter, float sphereRadius) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
 	viewer.addPointCloud<pcl::PointXYZ>(cloud.makeShared(), "sample cloud");
@@ -59,6 +60,7 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 	    cloud.makeShared(), normals.makeShared(), 10, 0.05, "normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
+	viewer.addSphere(sphereCenter, sphereRadius, 0.0, 1.0, 0.0, "sphere");
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce(100);
 	}

@@ -24,7 +24,7 @@ void centerCloud(pcl::PointCloud<pcl::PointXYZ> &cloud);
 void normalizeCloud(pcl::PointCloud<pcl::PointXYZ> &cloud);
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
-		     pcl::PointCloud<pcl::Normal> &normals);
+		     pcl::PointCloud<pcl::Normal> &normals, pcl::PointXYZ sphereCenter, float sphereRadius);
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
