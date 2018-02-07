@@ -12,7 +12,7 @@ include_directories(${PCL_INCLUDE_DIRS})
 file(GLOB SOURCES "src/*.cpp")
 
 add_definitions(${PCL_DEFINITIONS})
-add_executable(SHREC18 ${SOURCES} "./src/main.cpp" "./src/utils.cpp" "./src/comparison.h")
+add_executable(SHREC18 ${SOURCES} "./src/main.cpp" "./src/comparison.h")
 
 target_link_libraries(SHREC18 ${PCL_LIBRARIES})
 
