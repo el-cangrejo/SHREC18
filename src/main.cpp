@@ -3,7 +3,7 @@
 #include "utils.h"
 
 int main(int argc, char** argv) {
-	std::string queryFilepath = "shrec18_recognition/Queries/3.ply";
+	std::string queryFilepath = "shrec18_recognition/Queries/5.ply";
 	pcl::PointCloud<pcl::PointXYZ> queryCloud;
 	pcl::PointCloud<pcl::Normal> queryNormals;
 	pcl::PolygonMesh queryMesh;
@@ -16,8 +16,8 @@ int main(int argc, char** argv) {
 	computeNormals(queryMesh, queryCloud, queryNormals);
 	CloudWithNormals queryCloudWithNormals(queryCloud, queryNormals);
 
-	float radius = 0.10;
-	int index = 10000;
+	float radius = 0.05;
+	int index = 15000;
 	std::cout << "Computing features.." << std::endl;
 	auto queryFeatures =
 	    computeFeatures_SHOT352(queryCloudWithNormals, radius);
