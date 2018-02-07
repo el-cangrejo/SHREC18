@@ -60,9 +60,14 @@ int main(int argc, char **argv) {
 	// outer_radius);
 	// auto h = histogramDifference(pfh_inner.points[0].histogram,
 	// pfh_outer.points[0].histogram, 125);
-	int idx_t = 0;
-	minDistPoint(cloud_q, features_q, inner_radius, outer_radius, idx, idx_t);
+	std::vector<int> idx_t;
+	idx_t.push_back(idx);
 
-	enterViewerLoop(cloud_rgb, normals_q, cloud_rgb.points[idx], cloud_rgb.points[idx_t],
-			inner_radius);
+	for (int i = 1; i < 10; ++i) {
+		int idx_tmp = 0;
+		minDistPoint(cloud_q, features_q, inner_radius, outer_radius, idx_t[i - 1], idx_tmp);
+		idx_t.push_back(idx_tmp);
+	}
+
+	enterViewerLoop(cloud_rgb, normals_q, idx_t, inner_radius);
 }
