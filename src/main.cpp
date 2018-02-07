@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
 	CloudWithNormals cloud_qWithNormals(cloud_q, normals_q);
 	auto features_q =
 	    computeFeaturesSHOT352(cloud_qWithNormals, inner_radius);
+	// std::cout << "DEBUG" << std::endl;
 
 	// pcl::fromPCLPointCloud2(targetMesh.cloud, targetCloud);
 	// computeNormals(targetMesh, targetCloud, targetNormals);
@@ -48,18 +49,17 @@ int main(int argc, char **argv) {
 	//    computeFeatures_SHOT352(targetCloudWithNormals,
 	//    searchTargetRadius);
 
-	int featureSize = 352;
 	std::vector<float> distances = selfFeatureDistance(features_q, idx);
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	createRGBCloud(cloud_q, distances, cloud_rgb);
 	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
 
-	// auto pfh_inner = computePointFeatures_PFH(cloud_qWithNormals, idx,
-	// inner_radius);
-	// auto pfh_outer = computePointFeatures_PFH(cloud_qWithNormals, idx,
-	// outer_radius);
-	// auto h = histogramDifference(pfh_inner.points[0].histogram,
-	// pfh_outer.points[0].histogram, 125);
-
-	enterViewerLoop(cloud_rgb, normals_q, idx_t, inner_radius);
+	std::vector<int> indices_vec =
+	    findIndices(cloud_q, idx, inner_radius, outer_radius);
+	auto features_vec = matchIndicesFeatures(indices_vec, features_q);
+	int closestFeature_idx =
+	    findClosestFeature(features_vec, features_q[idx]);
+	std::cout << "Index of closest feature: " << closestFeature_idx
+		  << std::endl;
+	// enterViewerLoop(cloud_rgb, normals_q, idx_t, inner_radius);
 }

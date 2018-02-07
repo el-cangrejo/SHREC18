@@ -131,6 +131,7 @@ pcl::PointCloud<pcl::SHOT352> computeFeaturesSHOT352(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 	shot.setSearchMethod(tree);
 	shot.setRadiusSearch(searchRadius);
+	std::cout << "DEBUG" << std::endl;
 	shot.compute(outputFeatures);
 	return outputFeatures;
 }
@@ -167,21 +168,6 @@ std::vector<float> histDiff(float *first, float *second, int length) {
 	return diffs;
 }
 
-void minDistPoint(std::vector<pcl::SHOT352> &features, pcl::SHOT352 query_f,
-		  int &idx_t) {
-	float min_f_dist = 100000;
-
-	for (int i = 0; i < features.size(); i++) {
-		auto feature = features[i];
-		float f_dist = l2FeatureDistance(feature, query_f);
-
-		if (f_dist < min_f_dist) {
-			min_f_dist = f_dist;
-			idx_t = i;
-		}
-		std::cout << "Min distance point " << idx_t << "\n";
-	}
-}
 std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud, int idx,
 			     float inner_radius, float outer_radius) {
 	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
@@ -209,12 +195,29 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud, int idx,
 	return points_idx;
 }
 
-pcl::PointCloud<pcl::SHOT352> matchIndicesFeatures(
+std::vector<pcl::SHOT352> matchIndicesFeatures(
     std::vector<int> idxs, pcl::PointCloud<pcl::SHOT352> features) {
-	pcl::PointCloud<pcl::SHOT352> out_features;
+	std::vector<pcl::SHOT352> out_features;
 	for (int i = 0; i < idxs.size(); ++i) {
 		out_features.push_back(features[idxs[i]]);
 	}
 	return out_features;
+}
+
+int findClosestFeature(std::vector<pcl::SHOT352> &features,
+		       pcl::SHOT352 query_f) {
+	int out_index;
+	float min_f_dist = 100000;
+
+	for (int i = 0; i < features.size(); i++) {
+		auto feature = features[i];
+		float f_dist = l2FeatureDistance(feature, query_f);
+
+		if (f_dist < min_f_dist) {
+			min_f_dist = f_dist;
+			out_index = i;
+		}
+	}
+	return out_index;
 }
 #endif  // COMPARISON_HPP
