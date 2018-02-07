@@ -7,10 +7,10 @@
 int main(int argc, char **argv) {
 	std::cout << "Hello SHREC2018!\n";
 
-	//std::string queryModel = "shrec18_recognition/Dataset/" +
+	// std::string queryModel = "shrec18_recognition/Dataset/" +
 	//			 std::to_string(atoi(argv[1])) + ".ply";
 	std::string queryModel = "shrec18_recognition/Queries/" +
-	std::to_string(atoi(argv[1])) + ".ply";
+				 std::to_string(atoi(argv[1])) + ".ply";
 	pcl::PointCloud<pcl::PointXYZ> cloud_q;
 	pcl::PointCloud<pcl::Normal> normals_q;
 	pcl::PolygonMesh mesh_q;
@@ -64,13 +64,14 @@ int main(int argc, char **argv) {
 	idx_t.push_back(idx);
 	float r = inner_radius;
 
-	for (int i = 1; i < 10; ++i) {
+	for (int i = 1; i < 3; ++i) {
 		int idx_tmp = 0;
 		float r_tmp = 0;
 
 		std::cout << "Radius " << r << "\n";
-		minDistPoint(cloud_q, features_q, r, outer_radius, idx_t[i - 1], idx_tmp, r_tmp);
-		
+		minDistPoint(cloud_q, features_q, r, outer_radius, idx_t[i - 1],
+			     idx_tmp, r_tmp);
+
 		r = r_tmp;
 		idx_t.push_back(idx_tmp);
 	}
