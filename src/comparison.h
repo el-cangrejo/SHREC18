@@ -14,6 +14,7 @@
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/search/impl/search.hpp>
+#include <pcl/kdtree/kdtree_flann.h>
 
 #ifndef PCL_NO_PRECOMPILE
 #include <pcl/point_types.h>
@@ -159,6 +160,39 @@ std::vector<float> histDiff(float *first, float *second, int length) {
 	return diffs;
 }
 
-void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SHOT352> &features, float inner_radius, float outer_radius, int idx_q, int idx_t) {
+void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SHOT352> &features, float inner_radius, float outer_radius, int idx_q, int &idx_t) {
+	
+	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  pcl::PointXYZ query_p = cloud.points[idx_q];
+
+  kdtree.setInputCloud (cloud.makeShared());
+
+	std::vector<int> points_idx;
+  std::vector<float> points_dists;
+
+	if (!kdtree.radiusSearch (query_p, outer_radius, points_idx, points_dists) > 0)
+		std::cout << "No point found!\n";
+
+	std::cout << "Found " << points_idx.size() << "points!\n";
+	for (size_t i = 0; i < points_idx.size(); ++i) {
+		if (points_dists[i] > inner_radius) continue;
+
+		points_idx.erase(points_idx.begin() + i);
+		points_dists.erase(points_dists.begin() + i);
+	}
+	std::cout << "After erasing left " << points_idx.size() << "points!\n";
+
+	pcl::SHOT352 query_f = features[idx_q];
+	float max_f_dist = 100000;
+
+	for (int i = 0; i < points_idx.size(); ++i) {
+		float f_dist = l2FeatureDistance(features[points_idx[i]], query_f);
+
+		if (f_dist > max_f_dist) continue;
+
+		max_f_dist = f_dist;
+		idx_t = points_idx[i];
+	}
+	std::cout << "Min distance point " << idx_t << "\n";
 }
 #endif // COMPARISON_HPP
