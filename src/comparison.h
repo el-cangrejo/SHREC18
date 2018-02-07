@@ -225,4 +225,14 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud, int idx, flo
 
 	return points_idx;
 }
+
+pcl::PointCloud<pcl::SHOT352> matchIndicesFeatures(std::vector<int> idxs, 
+		pcl::PointCloud<pcl::SHOT352> features) {
+	
+	pcl::PointCloud<pcl::SHOT352> out_features;
+	for (int i = 0; i < idxs.size(); ++i) {
+		out_features.push_back(features[idxs[i]]);
+	}
+	return out_features;
+}
 #endif // COMPARISON_HPP
