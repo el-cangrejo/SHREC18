@@ -62,7 +62,7 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 	viewer.initCameraParameters();
 	viewer.addSphere(cloud[pointIndices[0]], sphereRadius, 0.0, 1.0, 0.0,
 			 "sphere");
-	for (int i = 1; i < sphereCenters.size(); i++)
+	for (int i = 1; i < pointIndices.size(); i++)
 		viewer.addSphere(cloud[pointIndices[i]], sphereRadius, 1.0, 0.0,
 				 1.0, "closest sphere" + std::to_string(i));
 	while (!viewer.wasStopped()) {

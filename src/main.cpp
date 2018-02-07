@@ -62,10 +62,16 @@ int main(int argc, char **argv) {
 	// pfh_outer.points[0].histogram, 125);
 	std::vector<int> idx_t;
 	idx_t.push_back(idx);
+	float r = inner_radius;
 
 	for (int i = 1; i < 10; ++i) {
 		int idx_tmp = 0;
-		minDistPoint(cloud_q, features_q, inner_radius, outer_radius, idx_t[i - 1], idx_tmp);
+		float r_tmp = 0;
+
+		std::cout << "Radius " << r << "\n";
+		minDistPoint(cloud_q, features_q, r, outer_radius, idx_t[i - 1], idx_tmp, r_tmp);
+		
+		r = r_tmp;
 		idx_t.push_back(idx_tmp);
 	}
 

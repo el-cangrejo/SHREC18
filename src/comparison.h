@@ -160,7 +160,7 @@ std::vector<float> histDiff(float *first, float *second, int length) {
 	return diffs;
 }
 
-void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SHOT352> &features, float inner_radius, float outer_radius, int idx_q, int &idx_t) {
+void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SHOT352> &features, float inner_radius, float outer_radius, int idx_q, int &idx_t, float &idx_dist) {
 	
 	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
   pcl::PointXYZ query_p = cloud.points[idx_q];
@@ -173,14 +173,14 @@ void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SH
 	if (!kdtree.radiusSearch (query_p, outer_radius, points_idx, points_dists) > 0)
 		std::cout << "No point found!\n";
 
-	std::cout << "Found " << points_idx.size() << "points!\n";
+	std::cout << "Found " << points_idx.size() << " points!\n";
 	for (size_t i = 0; i < points_idx.size(); ++i) {
 		if (points_dists[i] > inner_radius) continue;
 
 		points_idx.erase(points_idx.begin() + i);
 		points_dists.erase(points_dists.begin() + i);
 	}
-	std::cout << "After erasing left " << points_idx.size() << "points!\n";
+	std::cout << "After erasing left " << points_idx.size() << " points!\n";
 
 	pcl::SHOT352 query_f = features[idx_q];
 	float max_f_dist = 100000;
@@ -192,6 +192,7 @@ void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SH
 
 		max_f_dist = f_dist;
 		idx_t = points_idx[i];
+		idx_dist = points_dists[i];
 	}
 	std::cout << "Min distance point " << idx_t << "\n";
 }
