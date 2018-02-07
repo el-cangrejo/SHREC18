@@ -181,4 +181,40 @@ void minDistPoint(std::vector<pcl::SHOT352> &features, pcl::SHOT352 query_f,
 		}
 		std::cout << "Min distance point " << idx_t << "\n";
 	}
+}
+std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud, int idx,
+			     float inner_radius, float outer_radius) {
+	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+	pcl::PointXYZ query_p = cloud.points[idx];
+
+	kdtree.setInputCloud(cloud.makeShared());
+
+	std::vector<int> points_idx;
+	std::vector<float> points_dists;
+
+	std::cout << "Found "
+		  << kdtree.radiusSearch(query_p, outer_radius, points_idx,
+					 points_dists)
+		  << " points!\n";
+
+	for (size_t i = 0; i < points_idx.size(); ++i) {
+		if (points_dists[i] > inner_radius) continue;
+
+		points_idx.erase(points_idx.begin() + i);
+		points_dists.erase(points_dists.begin() + i);
+	}
+	// std::cout << "After erasing left " << points_idx.size() << "
+	// points!\n";
+
+	return points_idx;
+}
+
+pcl::PointCloud<pcl::SHOT352> matchIndicesFeatures(
+    std::vector<int> idxs, pcl::PointCloud<pcl::SHOT352> features) {
+	pcl::PointCloud<pcl::SHOT352> out_features;
+	for (int i = 0; i < idxs.size(); ++i) {
+		out_features.push_back(features[idxs[i]]);
+	}
+	return out_features;
+}
 #endif  // COMPARISON_HPP
