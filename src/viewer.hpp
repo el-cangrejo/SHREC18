@@ -7,7 +7,7 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
-
+#include <string>
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
 		     pcl::PointXYZ sphereCenter, float sphereRadius1,
@@ -48,8 +48,7 @@ void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
-		     std::vector<pcl::PointXYZRGB> sphereCenters,
-		     float sphereRadius) {
+		     std::vector<int> pointIndices, float sphereRadius) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
 	viewer.addPointCloud<pcl::PointXYZRGB>(cloud.makeShared(),
@@ -61,11 +60,11 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 	//"normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
-	viewer.addSphere(sphereCenters[0], sphereRadius, 0.0, 1.0, 0.0,
+	viewer.addSphere(cloud[pointIndices[0]], sphereRadius, 0.0, 1.0, 0.0,
 			 "sphere");
 	for (int i = 1; i < sphereCenters.size(); i++)
-		viewer.addSphere(sphereCenters[i], sphereRadius, 1.0, 0.0, 1.0,
-				 "sphere");
+		viewer.addSphere(cloud[pointIndices[i]], sphereRadius, 1.0, 0.0,
+				 1.0, "closest sphere" + std::to_string(i));
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce(100);
 	}
