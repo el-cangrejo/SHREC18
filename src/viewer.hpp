@@ -48,8 +48,7 @@ void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
-		     pcl::PointXYZRGB sphereCenter,
-		     pcl::PointXYZRGB closestFeatureCenter,
+		     std::vector<pcl::PointXYZRGB> sphereCenters,
 		     float sphereRadius) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
@@ -62,9 +61,11 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 	//"normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
-	viewer.addSphere(sphereCenter, sphereRadius, 0.0, 1.0, 0.0, "sphere");
-	viewer.addSphere(closestFeatureCenter, sphereRadius, 0.0, 0.0, 1.0,
+	viewer.addSphere(sphereCenters[0], sphereRadius, 0.0, 1.0, 0.0,
 			 "sphere");
+	for (int i = 1; i < sphereCenters.size(); i++)
+		viewer.addSphere(sphereCenters[i], sphereRadius, 1.0, 0.0, 1.0,
+				 "sphere");
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce(100);
 	}
