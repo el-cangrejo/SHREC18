@@ -64,14 +64,17 @@ int main(int argc, char **argv) {
 	idx_t.push_back(idx);
 	float r = inner_radius;
 
-	for (int i = 1; i < 10; ++i) {
+	for (int i = 1; i < 2; ++i) {
 		int idx_tmp = 0;
 		float r_tmp = 0;
 
 		std::cout << "Radius " << r << "\n";
+		std::cout << "Out Radius " << outer_radius << "\n";
+		std::cout << "Point " << idx_t[i-1] << "\n";
 		minDistPoint(cloud_q, features_q, r, outer_radius, idx_t[i - 1], idx_tmp, r_tmp);
-		
-		r = r_tmp;
+		std::cout << "Point found " << idx_tmp << "\n";
+
+		r = inner_radius + r_tmp;
 		idx_t.push_back(idx_tmp);
 	}
 

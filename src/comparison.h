@@ -174,8 +174,12 @@ void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SH
 		std::cout << "No point found!\n";
 
 	std::cout << "Found " << points_idx.size() << " points!\n";
+
 	for (size_t i = 0; i < points_idx.size(); ++i) {
-		if (points_dists[i] > inner_radius) continue;
+		std::cout << "\nDists : " << points_dists[i]; 
+		if (points_dists[i] >= inner_radius) continue;
+		
+		std::cout << "Deleted\n\n";
 
 		points_idx.erase(points_idx.begin() + i);
 		points_dists.erase(points_dists.begin() + i);
@@ -188,12 +192,37 @@ void minDistPoint(pcl::PointCloud<pcl::PointXYZ> &cloud, pcl::PointCloud<pcl::SH
 	for (int i = 0; i < points_idx.size(); ++i) {
 		float f_dist = l2FeatureDistance(features[points_idx[i]], query_f);
 
-		if (f_dist > max_f_dist) continue;
-
-		max_f_dist = f_dist;
-		idx_t = points_idx[i];
-		idx_dist = points_dists[i];
+		if (f_dist < max_f_dist) {
+			max_f_dist = f_dist;
+			idx_t = points_idx[i];
+			idx_dist = points_dists[i];
+		}
 	}
 	std::cout << "Min distance point " << idx_t << "\n";
+	std::cout << "Min distance " << idx_dist << "\n";
+}
+
+std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud, int idx, float inner_radius, float outer_radius) {
+	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  pcl::PointXYZ query_p = cloud.points[idx];
+
+  kdtree.setInputCloud (cloud.makeShared());
+
+	std::vector<int> points_idx;
+  std::vector<float> points_dists;
+
+	std::cout << "Found " <<
+		kdtree.radiusSearch (query_p, outer_radius, points_idx, points_dists)
+		<< " points!\n";
+
+	for (size_t i = 0; i < points_idx.size(); ++i) {
+		if (points_dists[i] > inner_radius) continue;
+		
+		points_idx.erase(points_idx.begin() + i);
+		points_dists.erase(points_dists.begin() + i);
+	}
+	//std::cout << "After erasing left " << points_idx.size() << " points!\n";
+
+	return points_idx;
 }
 #endif // COMPARISON_HPP
