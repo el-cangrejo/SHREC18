@@ -64,7 +64,7 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 	viewer.initCameraParameters();
 	viewer.addSphere(sphereCenter, sphereRadius, 0.0, 1.0, 0.0, "sphere");
 	viewer.addSphere(closestFeatureCenter, sphereRadius, 0.0, 0.0, 1.0,
-			 "sphere");
+			 "sphere_t");
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce(100);
 	}

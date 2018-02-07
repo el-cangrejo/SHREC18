@@ -7,10 +7,10 @@
 int main(int argc, char **argv) {
 	std::cout << "Hello SHREC2018!\n";
 
-	std::string queryModel = "shrec18_recognition/Dataset/" +
-				 std::to_string(atoi(argv[1])) + ".ply";
-	// std::string queryModel = "shrec18_recognition/Queries/" +
-	// std::to_string(atoi(argv[1])) + ".ply";
+	//std::string queryModel = "shrec18_recognition/Dataset/" +
+	//			 std::to_string(atoi(argv[1])) + ".ply";
+	std::string queryModel = "shrec18_recognition/Queries/" +
+	std::to_string(atoi(argv[1])) + ".ply";
 	pcl::PointCloud<pcl::PointXYZ> cloud_q;
 	pcl::PointCloud<pcl::Normal> normals_q;
 	pcl::PolygonMesh mesh_q;
@@ -60,7 +60,9 @@ int main(int argc, char **argv) {
 	// outer_radius);
 	// auto h = histogramDifference(pfh_inner.points[0].histogram,
 	// pfh_outer.points[0].histogram, 125);
+	int idx_t = 0;
+	minDistPoint(cloud_q, features_q, inner_radius, outer_radius, idx, idx_t);
 
-	enterViewerLoop(cloud_rgb, normals_q, cloud_rgb.points[idx],
-			closestFeatureCenter, inner_radius);
+	enterViewerLoop(cloud_rgb, normals_q, cloud_rgb.points[idx], cloud_rgb.points[idx_t],
+			inner_radius);
 }
