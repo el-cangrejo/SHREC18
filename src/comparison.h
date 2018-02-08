@@ -171,7 +171,7 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 			     float inner_radius, float outer_radius,
 			     std::vector<int> nodes_idx) {
 	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
-	pcl::PointXYZ query_p = cloud.points[idx];
+	pcl::PointXYZ query_p = cloud.points[nodes_idx.back()];
 
 	kdtree.setInputCloud(cloud.makeShared());
 
