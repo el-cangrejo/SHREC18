@@ -53,25 +53,20 @@ int main(int argc, char **argv) {
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	createRGBCloud(cloud_q, distances, cloud_rgb);
 	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
-	std::vector<int> blueSpheres_idx;
-	int center_idx = idx;
+	std::vector<int> nodes_idx{idx};
 	// Plane3D plane;
 	for (int i = 0; i < 3; i++) {
-		std::vector<int> indices_vec = findIndices(
-		    cloud_q, center_idx, inner_radius, outer_radius);
+		std::vector<int> indices_vec =
+		    findIndices(cloud_q, inner_radius, outer_radius, nodes_idx);
 		auto features_vec =
 		    matchIndicesFeatures(indices_vec, features_q);
 		int closestFeature_idx =
 		    findClosestFeature(features_vec, features_q[center_idx]);
 		std::cout << "Index of closest feature: "
 			  << indices_vec[closestFeature_idx] << std::endl;
-		blueSpheres_idx.push_back(indices_vec[closestFeature_idx]);
-		center_idx = blueSpheres_idx.back();
+		nodes_idx.push_back(indices_vec[closestFeature_idx]);
 	}
 
-	std::cout << "Angle:" << computeAngle(Eigen::Vector3d(1, 1, 0),
-					      Eigen::Vector3d(0, 1, 0))
-		  << std::endl;
 	enterViewerLoop(cloud_rgb, normals_q, idx, blueSpheres_idx,
 			inner_radius);
 }
