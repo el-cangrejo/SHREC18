@@ -184,7 +184,19 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 		  << " points!\n";
 
 	for (size_t i = 0; i < points_idx.size(); ++i) {
-		if (points_dists[i] > inner_radius) continue;
+		if (nodes_idx.size() == 1) {
+			if (points_dists[i] > inner_radius) continue;
+		} else {
+			const auto &points = cloud.points;
+			auto first_point =
+			    points[points_idx[nodes_idx.size() - 2]];
+			auto center_point =
+			    points[points_idx[nodes_idx.size() - 1]];
+			auto last_point = points[points_idx[i]];
+			if (points_dists[i] > inner_radius &&
+			    checkAngle(first_point, center_point, last_point))
+				continue;
+		}
 
 		points_idx.erase(points_idx.begin() + i);
 		points_dists.erase(points_dists.begin() + i);
@@ -223,11 +235,11 @@ int findClosestFeature(std::vector<pcl::SHOT352> &features,
 }
 
 bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c,
-		float angle) {
-	Eigen::Vector3d b_to_a(b.x - a.x, b.y - a.y, b.z - a.z);
-	Eigen::Vector3d b_to_c(b.x - c.x, b.y - c.y, b.z - c.z);
+		float threshold_angle = 90) {
+	Eigen::Vector3d b_to_a(a.x - b.x, a.y - b.y, a.z - b.z);
+	Eigen::Vector3d b_to_c(c.x - b.x, c.y - b.y, c.z - b.z);
 
-	if (angle >) return false;
+	if (threshold_angle > computeAngle(b_to_a, b_to_c)) return false;
 
 	return true;
 }
