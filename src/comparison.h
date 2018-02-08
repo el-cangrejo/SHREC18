@@ -171,7 +171,7 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 			     float inner_radius, float outer_radius,
 			     std::vector<int> nodes_idx) {
 	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
-	pcl::PointXYZ query_p = cloud.points[idx];
+	pcl::PointXYZ query_p = cloud.points[nodes_idx.back()];
 
 	kdtree.setInputCloud(cloud.makeShared());
 
@@ -227,7 +227,7 @@ bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c,
 	Eigen::Vector3d b_to_a(b.x - a.x, b.y - a.y, b.z - a.z);
 	Eigen::Vector3d b_to_c(b.x - c.x, b.y - c.y, b.z - c.z);
 
-	if (angle >) return false;
+	if (angle > 90) return false;
 
 	return true;
 }
