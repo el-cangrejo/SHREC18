@@ -53,13 +53,23 @@ int main(int argc, char **argv) {
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	createRGBCloud(cloud_q, distances, cloud_rgb);
 	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
-
-	std::vector<int> indices_vec =
-	    findIndices(cloud_q, idx, inner_radius, outer_radius);
-	auto features_vec = matchIndicesFeatures(indices_vec, features_q);
-	int closestFeature_idx =
-	    findClosestFeature(features_vec, features_q[idx]);
-	std::cout << "Index of closest feature: " << closestFeature_idx
-		  << std::endl;
-	// enterViewerLoop(cloud_rgb, normals_q, idx_t, inner_radius);
+	std::vector<int> blueSpheres_idx;
+	int center_idx = idx;
+	// Plane3D plane;
+	for (int i = 0; i < 3; i++) {
+		std::vector<int> indices_vec = findIndices(
+		    cloud_q, center_idx, inner_radius, outer_radius);
+		auto features_vec =
+		    matchIndicesFeatures(indices_vec, features_q);
+		int closestFeature_idx =
+		    findClosestFeature(features_vec, features_q[center_idx]);
+		std::cout << "Index of closest feature: "
+			  << indices_vec[closestFeature_idx] << std::endl;
+		blueSpheres_idx.push_back(indices_vec[closestFeature_idx]);
+		center_idx = blueSpheres_idx.back();
+		// pcl::PointXYZ n();
+		// plane = Plane(cloud_q.points[aroundIndex], n);
+	}
+	enterViewerLoop(cloud_rgb, normals_q, idx, blueSpheres_idx,
+			inner_radius);
 }

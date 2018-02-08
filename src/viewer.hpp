@@ -10,8 +10,9 @@
 #include <string>
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 		     pcl::PointCloud<pcl::Normal> &normals,
-		     pcl::PointXYZ sphereCenter, float sphereRadius1,
-		     float sphereRadius2) {
+		     pcl::PointXYZ sphereCenter,
+		     std::vector<pcl::PointXYZ> blueSpheres,
+		     float sphereRadius1, float sphereRadius2) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
 	viewer.addPointCloud<pcl::PointXYZ>(cloud.makeShared(), "sample cloud");
@@ -21,8 +22,7 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZ> &cloud,
 	    cloud.makeShared(), normals.makeShared(), 10, 0.05, "normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
-	viewer.addSphere(sphereCenter, sphereRadius1, 0.0, 1.0, 0.0, "sphere");
-	viewer.addSphere(sphereCenter, sphereRadius2, 1.0, 0.0, 0.0, "sphere1");
+
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce(100);
 	}
@@ -47,8 +47,8 @@ void enterViewerLoopMesh(pcl::PolygonMesh &mesh,
 }
 
 void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
-		     pcl::PointCloud<pcl::Normal> &normals,
-		     std::vector<int> pointIndices, float sphereRadius) {
+		     pcl::PointCloud<pcl::Normal> &normals, int greenSphere_idx,
+		     std::vector<int> blueSpheres_idx, float sphereRadius) {
 	pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 	viewer.setBackgroundColor(0, 0, 0);
 	viewer.addPointCloud<pcl::PointXYZRGB>(cloud.makeShared(),
@@ -60,11 +60,15 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 	//"normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
-	viewer.addSphere(cloud[pointIndices[0]], sphereRadius, 0.0, 1.0, 0.0,
+	viewer.addSphere(cloud[greenSphere_idx], sphereRadius, 0.0, 1.0, 0.0,
 			 "sphere");
-	for (int i = 1; i < pointIndices.size(); i++)
-		viewer.addSphere(cloud[pointIndices[i]], sphereRadius, 1.0, 0.0,
-				 1.0, "closest sphere" + std::to_string(i));
+	for (int i = 0; i < blueSpheres_idx.size(); i++) {
+		viewer.addSphere(cloud.points[blueSpheres_idx[i]], sphereRadius,
+				 0.0, 0.0, 1.0, "sphere" + std::to_string(i));
+	}
+	// for (int i = 1; i < pointIndices.size(); i++)
+	// viewer.addSphere(cloud[pointIndices[i]], sphereRadius, 1.0, 0.0, 1.0,
+	// 		 "closest sphere" + std::to_string(i));
 	while (!viewer.wasStopped()) {
 		viewer.spinOnce(100);
 	}

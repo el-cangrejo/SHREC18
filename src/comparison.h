@@ -131,7 +131,6 @@ pcl::PointCloud<pcl::SHOT352> computeFeaturesSHOT352(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 	shot.setSearchMethod(tree);
 	shot.setRadiusSearch(searchRadius);
-	std::cout << "DEBUG" << std::endl;
 	shot.compute(outputFeatures);
 	return outputFeatures;
 }
