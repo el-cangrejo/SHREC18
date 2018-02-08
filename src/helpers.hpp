@@ -112,16 +112,12 @@ void createRGBCloud(const pcl::PointCloud<pcl::PointXYZ> &input,
 	for (int i = 0; i < dists.size(); i++)
 		output[i].r = 255 * dists[i] / range;
 }
-
-struct Plane3D {
-	pcl::PointXYZ pointOnPlane;
-	pcl::PointXYZ n;
-	Plane3D(pcl::PointXYZ p, pcl::PointXYZ normal)
-	    : n(normal), pointOnPlane(p) {}
-	float computeEquation(pcl::PointXYZ p) {
-		return n.x * (p.x - pointOnPlane.x) +
-		       n.y * (p.y - pointOnPlane.y) +
-		       n.z * (p.z - pointOnPlane.z);
-	}
-};
+#define M_PI 3.14159265358979323846 /* pi */
+float computeAngle(Eigen::Vector3d a, Eigen::Vector3d b) {
+	float dp = a.dot(b);
+	float length_a = std::sqrt(a.dot(a));
+	float length_b = std::sqrt(b.dot(b));
+	float angle_rad = std::acos(dp / (length_a * length_b));
+	return angle_rad * 180 / M_PI;
+}
 #endif  // HELPERS_HPP

@@ -67,9 +67,11 @@ int main(int argc, char **argv) {
 			  << indices_vec[closestFeature_idx] << std::endl;
 		blueSpheres_idx.push_back(indices_vec[closestFeature_idx]);
 		center_idx = blueSpheres_idx.back();
-		// pcl::PointXYZ n();
-		// plane = Plane(cloud_q.points[aroundIndex], n);
 	}
+
+	std::cout << "Angle:" << computeAngle(Eigen::Vector3d(1, 1, 0),
+					      Eigen::Vector3d(0, 1, 0))
+		  << std::endl;
 	enterViewerLoop(cloud_rgb, normals_q, idx, blueSpheres_idx,
 			inner_radius);
 }

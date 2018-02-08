@@ -167,8 +167,9 @@ std::vector<float> histDiff(float *first, float *second, int length) {
 	return diffs;
 }
 
-std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud, int idx,
-			     float inner_radius, float outer_radius) {
+std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
+			     float inner_radius, float outer_radius,
+			     std::vector<int> nodes_idx) {
 	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
 	pcl::PointXYZ query_p = cloud.points[idx];
 
@@ -188,6 +189,7 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud, int idx,
 		points_idx.erase(points_idx.begin() + i);
 		points_dists.erase(points_dists.begin() + i);
 	}
+
 	// std::cout << "After erasing left " << points_idx.size() << "
 	// points!\n";
 
@@ -220,12 +222,12 @@ int findClosestFeature(std::vector<pcl::SHOT352> &features,
 	return out_index;
 }
 
-bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c, float angle) {
+bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c,
+		float angle) {
 	Eigen::Vector3d b_to_a(b.x - a.x, b.y - a.y, b.z - a.z);
 	Eigen::Vector3d b_to_c(b.x - c.x, b.y - c.y, b.z - c.z);
 
-
-	if (angle > )  return false;
+	if (angle >) return false;
 
 	return true;
 }
