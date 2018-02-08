@@ -16,4 +16,4 @@ add_executable(SHREC18 ${SOURCES} "./src/main.cpp" "./src/comparison.h")
 
 target_link_libraries(SHREC18 ${PCL_LIBRARIES})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -std=c++11")

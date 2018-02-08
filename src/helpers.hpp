@@ -118,6 +118,7 @@ float computeAngle(Eigen::Vector3d a, Eigen::Vector3d b) {
 	float length_a = std::sqrt(a.dot(a));
 	float length_b = std::sqrt(b.dot(b));
 	float angle_rad = std::acos(dp / (length_a * length_b));
+	//std::cout << "Angle " << angle_rad << "\n";
 	return angle_rad * 180 / M_PI;
 }
 #endif  // HELPERS_HPP

@@ -57,22 +57,19 @@ int main(int argc, char **argv) {
 	
 	int N = 12;
 	// Plane3D plane;
-	for (int i = 0; i < N; i++) {
-		std::vector<int> indices_vec =
-		    findIndices(cloud_q, inner_radius, outer_radius, nodes_idx);
+	std::vector<int> indices_vec;
+	for (int i = 0; i < 2; i++) {
+		indices_vec = findIndices(cloud_q, inner_radius, outer_radius, nodes_idx);
 
-		auto features_vec =
-		    matchIndicesFeatures(indices_vec, features_q);
+		auto features_vec = matchIndicesFeatures(indices_vec, features_q);
 		
-		int closestFeature_idx =
-		    findClosestFeature(features_vec, features_q[nodes_idx.back()]);
+		int closestFeature_idx = findClosestFeature(features_vec, features_q[nodes_idx.back()]);
 		
-		std::cout << "Index of closest feature: "
-			  << indices_vec[closestFeature_idx] << std::endl;
+		std::cout << "Index of closest feature: " << indices_vec[closestFeature_idx] << std::endl;
 		
-		nodes_idx.push_back(indices_vec[closestFeature_idx]);
+		nodes_idx.push_back(closestFeature_idx);
+		//std::cout << nodes_idx.size() << " nodes!\n";
 	}
 
-	enterViewerLoop(cloud_rgb, normals_q, nodes_idx,
-			inner_radius);
+	enterViewerLoop(cloud_rgb, normals_q, indices_vec, 0.01);
 }

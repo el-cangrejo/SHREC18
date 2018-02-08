@@ -21,6 +21,7 @@
 #include <pcl/impl/instantiate.hpp>
 PCL_INSTANTIATE(Search, PCL_POINT_TYPES)
 #endif  // PCL_NO_PRECOMPILE
+#include "helpers.hpp"
 
 struct CloudWithNormals {
 	pcl::PointCloud<pcl::PointXYZ> cloudPositions;
@@ -167,6 +168,16 @@ std::vector<float> histDiff(float *first, float *second, int length) {
 	return diffs;
 }
 
+bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c,
+		float threshold_angle = 90) {
+	Eigen::Vector3d b_to_a(a.x - b.x, a.y - b.y, a.z - b.z);
+	Eigen::Vector3d b_to_c(c.x - b.x, c.y - b.y, c.z - b.z);
+
+	if (threshold_angle > computeAngle(b_to_a, b_to_c)) return false;
+
+	return true;
+}
+
 std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 			     float inner_radius, float outer_radius,
 			     std::vector<int> nodes_idx) {
@@ -175,37 +186,33 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 
 	kdtree.setInputCloud(cloud.makeShared());
 
+	std::vector<int> points_to_return;
 	std::vector<int> points_idx;
 	std::vector<float> points_dists;
 
-	std::cout << "Found "
-		  << kdtree.radiusSearch(query_p, outer_radius, points_idx,
-					 points_dists)
-		  << " points!\n";
+	int num_of_points = kdtree.radiusSearch(query_p, outer_radius, points_idx, points_dists);
+
+	std::cout << "Found " << num_of_points << " points!\n";
 
 	for (size_t i = 0; i < points_idx.size(); ++i) {
-		if (nodes_idx.size() == 1) {
-			if (points_dists[i] > inner_radius) continue;
-		} else {
-			const auto &points = cloud.points;
-			auto first_point =
-			    points[points_idx[nodes_idx.size() - 2]];
-			auto center_point =
-			    points[points_idx[nodes_idx.size() - 1]];
-			auto last_point = points[points_idx[i]];
-			if (points_dists[i] > inner_radius &&
-			    checkAngle(first_point, center_point, last_point))
-				continue;
+		if (points_dists[i] < pow(inner_radius, 2)) continue;
+		
+		std::cout << "Nodes idx " << nodes_idx.size() << "!\n";
+		if (nodes_idx.size() > 1) {
+			auto a = cloud.points[nodes_idx[nodes_idx.size() - 1]];
+			auto b = cloud.points[nodes_idx[nodes_idx.size()]];
+			auto c = cloud.points[points_idx[i]];
+			
+			std::cout << "Checing angle!\n";
+			if (!checkAngle(a, b, c)) continue;
 		}
 
-		points_idx.erase(points_idx.begin() + i);
-		points_dists.erase(points_dists.begin() + i);
+		points_to_return.push_back(points_idx[i]);
 	}
 
-	// std::cout << "After erasing left " << points_idx.size() << "
-	// points!\n";
+	std::cout << "After erasing left " << points_to_return.size() << " points!\n";
 
-	return points_idx;
+	return points_to_return;
 }
 
 std::vector<pcl::SHOT352> matchIndicesFeatures(
@@ -234,14 +241,5 @@ int findClosestFeature(std::vector<pcl::SHOT352> &features,
 	return out_index;
 }
 
-bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c,
-		float threshold_angle = 90) {
-	Eigen::Vector3d b_to_a(a.x - b.x, a.y - b.y, a.z - b.z);
-	Eigen::Vector3d b_to_c(c.x - b.x, c.y - b.y, c.z - b.z);
-
-	if (threshold_angle > computeAngle(b_to_a, b_to_c)) return false;
-
-	return true;
-}
 
 #endif  // COMPARISON_HPP
