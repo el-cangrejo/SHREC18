@@ -219,4 +219,15 @@ int findClosestFeature(std::vector<pcl::SHOT352> &features,
 	}
 	return out_index;
 }
+
+bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c, float angle) {
+	Eigen::Vector3d b_to_a(b.x - a.x, b.y - a.y, b.z - a.z);
+	Eigen::Vector3d b_to_c(b.x - c.x, b.y - c.y, b.z - c.z);
+
+
+	if (angle > )  return false;
+
+	return true;
+}
+
 #endif  // COMPARISON_HPP
