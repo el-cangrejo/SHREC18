@@ -192,25 +192,27 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 
 	int num_of_points = kdtree.radiusSearch(query_p, outer_radius, points_idx, points_dists);
 
-	std::cout << "Found " << num_of_points << " points!\n";
+	//std::cout << "Found " << num_of_points << " points!\n";
 
 	for (size_t i = 0; i < points_idx.size(); ++i) {
 		if (points_dists[i] < pow(inner_radius, 2)) continue;
 		
-		std::cout << "Nodes idx " << nodes_idx.size() << "!\n";
+		//std::cout << "Nodes idx " << nodes_idx.size() << "!\n";
 		if (nodes_idx.size() > 1) {
-			auto a = cloud.points[nodes_idx[nodes_idx.size() - 1]];
-			auto b = cloud.points[nodes_idx[nodes_idx.size()]];
+			//std::cout << "Points to check " << nodes_idx[nodes_idx.size() - 1] << " " << nodes_idx[nodes_idx.size()] << "\n";
+			if (std::find(nodes_idx.begin(), nodes_idx.end(), points_idx[i]) != nodes_idx.end()) continue;
+			auto a = cloud.points[nodes_idx[nodes_idx.size() - 2]];
+			auto b = cloud.points[nodes_idx[nodes_idx.size() - 1]];
 			auto c = cloud.points[points_idx[i]];
 			
-			std::cout << "Checing angle!\n";
-			if (!checkAngle(a, b, c)) continue;
+			//std::cout << "Checing angle!\n";
+			if (!checkAngle(a, b, c, 155)) continue;
 		}
 
 		points_to_return.push_back(points_idx[i]);
 	}
 
-	std::cout << "After erasing left " << points_to_return.size() << " points!\n";
+	//std::cout << "After erasing left " << points_to_return.size() << " points!\n";
 
 	return points_to_return;
 }
