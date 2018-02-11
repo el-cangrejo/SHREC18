@@ -16,6 +16,10 @@
 #include <pcl/keypoints/iss_3d.h>
 #include <pcl/features/principal_curvatures.h>
 
+#include "helpers.hpp"
+#include "comparison.h"
+#include "viewer.hpp"
+
 void computeMeanCurvature(int a) { using namespace Eigen; }
 
 int main(int argc, char* argv[]) {
