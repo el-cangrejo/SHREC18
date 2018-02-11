@@ -11,13 +11,18 @@
 #include <igl/viewer/Viewer.h>
 #include <iostream>
 
-#include <pcl/keypoints/harris_3d.h>
 #include <pcl/features/boundary.h>
-#include <pcl/keypoints/iss_3d.h>
 #include <pcl/features/principal_curvatures.h>
+#include <pcl/keypoints/harris_3d.h>
+#include <pcl/keypoints/iss_3d.h>
 
-void computeMeanCurvature(int a) { using namespace Eigen; }
+void open_dialog_load_mesh() {
+	td::string fname = igl::file_dialog_open();
 
+	if (fname.length() == 0) return;
+
+	this->load_mesh_from_file(fname.c_str());
+}
 int main(int argc, char* argv[]) {
 	using namespace Eigen;
 	std::string filepath = "shrec18_recognition/Queries/";
@@ -36,7 +41,6 @@ int main(int argc, char* argv[]) {
 	// computeMeanCurvature(V, F, H, viewer);
 
 	viewer.data.set_mesh(V, F);
-
 
 	viewer.callback_key_down = [](igl::viewer::Viewer& viewer,
 				      unsigned char key, int mod) -> bool {
@@ -80,6 +84,17 @@ int main(int argc, char* argv[]) {
 			return false;
 		}
 	};
+	viewer.callback_init = [&](igl::viewer::Viewer& viewer) {
 
+		// Add new group
+		viewer.ngui->addGroup("Mesh IO");
+		// Add a button
+		viewer.ngui->addButton("Load Mesh",
+				       [&]() { open_dialog_load_mesh)(); });
+
+		// call to generate menu
+		viewer.screen->performLayout();
+		return false;
+	};
 	viewer.launch();
 }
