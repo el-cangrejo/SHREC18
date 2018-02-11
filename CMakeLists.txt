@@ -11,3 +11,4 @@ target_link_libraries(${PROJECT_NAME}_bin igl::core igl::viewer tutorials
 	${PCL_LIBRARIES})
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -std=c++11")
+

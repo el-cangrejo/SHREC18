@@ -16,6 +16,10 @@
 #include <pcl/keypoints/harris_3d.h>
 #include <pcl/keypoints/iss_3d.h>
 
+#include "comparison.h"
+#include "helpers.hpp"
+#include "viewer.hpp"
+
 void open_dialog_load_mesh() {
 	td::string fname = igl::file_dialog_open();
 
