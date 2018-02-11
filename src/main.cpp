@@ -24,9 +24,6 @@
 #include "helpers.hpp"
 #include "viewer.hpp"
 
-void load_mesh_from_file(std::string mesh_file_name) {}
-void open_dialog_load_mesh() {
-}
 int main(int argc, char* argv[]) {
 	using namespace Eigen;
 	std::string filepath = "shrec18_recognition/Queries/";
@@ -41,6 +38,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Number of vertices: " << V.rows() << std::endl;
 
 	igl::viewer::Viewer viewer;
+	viewer.core.show_lines = false;
 	VectorXd H;
 	// computeMeanCurvature(V, F, H, viewer);
 
@@ -89,17 +87,13 @@ int main(int argc, char* argv[]) {
 		}
 	};
 	viewer.callback_init = [&](igl::viewer::Viewer& viewer) {
-
-		// Add new group
-		viewer.ngui->addGroup("Mesh IO");
-		// Add a button
 		viewer.ngui->addButton("Load Mesh", [&]() {
-	std::string fname = igl::file_dialog_open();
 
-	if (fname.length() == 0) return;
+			std::string fname = igl::file_dialog_open();
 
-			std::string mesh_file_name_string =
-			    std::string(fname);
+			if (fname.length() == 0) return;
+
+			std::string mesh_file_name_string = std::string(fname);
 			size_t last_dot = mesh_file_name_string.rfind('.');
 			if (last_dot == std::string::npos) {
 				printf("Error: No file extension found in %s\n",
@@ -110,14 +104,29 @@ int main(int argc, char* argv[]) {
 			if (extension == "ply" || extension == "PLY") {
 				Eigen::MatrixXd V;
 				Eigen::MatrixXi F;
+				igl::read_triangle_mesh(mesh_file_name_string,
+							V, F);
+				viewer.data.clear();
+				viewer.data.set_mesh(V, F);
 				std::cout << "Ply file" << std::endl;
 			}
-				std::cout<<"load mesh"<<std::endl;
+			viewer.data.compute_normals();
+			viewer.data.uniform_colors(
+			    Eigen::Vector3d(51.0 / 255.0, 43.0 / 255.0,
+					    33.3 / 255.0),
+			    Eigen::Vector3d(255.0 / 255.0, 228.0 / 255.0,
+					    58.0 / 255.0),
+			    Eigen::Vector3d(255.0 / 255.0, 235.0 / 255.0,
+					    80.0 / 255.0));
+			if (viewer.data.V_uv.rows() == 0) {
+				viewer.data.grid_texture();
+			}
+			viewer.core.align_camera_center(viewer.data.V,
+							viewer.data.F);
+
 		});
 
-		// call to generate menu
 		viewer.screen->performLayout();
-				return false;
-	};
-	viewer.launch();
+		return false;
+	} viewer.launch();
 }
