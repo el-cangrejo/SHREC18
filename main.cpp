@@ -10,6 +10,8 @@
 #include <igl/principal_curvature.h>
 #include <igl/read_triangle_mesh.h>
 #include <igl/viewer/Viewer.h>
+#include <nanogui/formhelper.h>
+#include <nanogui/screen.h>
 
 #include <iostream>
 
@@ -24,11 +26,6 @@
 
 void load_mesh_from_file(std::string mesh_file_name) {}
 void open_dialog_load_mesh() {
-	td::string fname = igl::file_dialog_open();
-
-	if (fname.length() == 0) return;
-
-	load_mesh_from_file(fname.c_str());
 }
 int main(int argc, char* argv[]) {
 	using namespace Eigen;
@@ -97,13 +94,16 @@ int main(int argc, char* argv[]) {
 		viewer.ngui->addGroup("Mesh IO");
 		// Add a button
 		viewer.ngui->addButton("Load Mesh", [&]() {
+	std::string fname = igl::file_dialog_open();
+
+	if (fname.length() == 0) return;
+
 			std::string mesh_file_name_string =
-			    std::string(mesh_file_name);
+			    std::string(fname);
 			size_t last_dot = mesh_file_name_string.rfind('.');
 			if (last_dot == std::string::npos) {
 				printf("Error: No file extension found in %s\n",
-				       mesh_file_name);
-				return false;
+				       mesh_file_name_string);
 			}
 			std::string extension =
 			    mesh_file_name_string.substr(last_dot + 1);
@@ -112,12 +112,12 @@ int main(int argc, char* argv[]) {
 				Eigen::MatrixXi F;
 				std::cout << "Ply file" << std::endl;
 			}
-
+				std::cout<<"load mesh"<<std::endl;
 		});
 
 		// call to generate menu
 		viewer.screen->performLayout();
-		return false;
+				return false;
 	};
 	viewer.launch();
 }
