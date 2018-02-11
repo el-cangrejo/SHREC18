@@ -1,5 +1,6 @@
 #include <igl/avg_edge_length.h>
 #include <igl/cotmatrix.h>
+#include <igl/file_dialog_open.h>
 #include <igl/invert_diag.h>
 #include <igl/massmatrix.h>
 #include <igl/parula.h>
@@ -9,6 +10,7 @@
 #include <igl/principal_curvature.h>
 #include <igl/read_triangle_mesh.h>
 #include <igl/viewer/Viewer.h>
+
 #include <iostream>
 
 #include <pcl/features/boundary.h>
@@ -20,12 +22,13 @@
 #include "helpers.hpp"
 #include "viewer.hpp"
 
+void load_mesh_from_file(std::string mesh_file_name) {}
 void open_dialog_load_mesh() {
 	td::string fname = igl::file_dialog_open();
 
 	if (fname.length() == 0) return;
 
-	this->load_mesh_from_file(fname.c_str());
+	load_mesh_from_file(fname.c_str());
 }
 int main(int argc, char* argv[]) {
 	using namespace Eigen;
@@ -93,8 +96,24 @@ int main(int argc, char* argv[]) {
 		// Add new group
 		viewer.ngui->addGroup("Mesh IO");
 		// Add a button
-		viewer.ngui->addButton("Load Mesh",
-				       [&]() { open_dialog_load_mesh)(); });
+		viewer.ngui->addButton("Load Mesh", [&]() {
+			std::string mesh_file_name_string =
+			    std::string(mesh_file_name);
+			size_t last_dot = mesh_file_name_string.rfind('.');
+			if (last_dot == std::string::npos) {
+				printf("Error: No file extension found in %s\n",
+				       mesh_file_name);
+				return false;
+			}
+			std::string extension =
+			    mesh_file_name_string.substr(last_dot + 1);
+			if (extension == "ply" || extension == "PLY") {
+				Eigen::MatrixXd V;
+				Eigen::MatrixXi F;
+				std::cout << "Ply file" << std::endl;
+			}
+
+		});
 
 		// call to generate menu
 		viewer.screen->performLayout();
