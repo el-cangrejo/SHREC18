@@ -180,7 +180,7 @@ bool checkAngle(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c,
 
 std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 			     float inner_radius, float outer_radius,
-			     std::vector<int> nodes_idx) {
+			     std::vector<int> nodes_idx, std::vector<float> &distances) {
 	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
 	pcl::PointXYZ query_p = cloud.points[nodes_idx.back()];
 
@@ -196,6 +196,8 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 
 	for (size_t i = 0; i < points_idx.size(); ++i) {
 		if (points_dists[i] < pow(inner_radius, 2)) continue;
+
+		if (distances[points_idx[i]] == 255) continue;
 		
 		//std::cout << "Nodes idx " << nodes_idx.size() << "!\n";
 		if (nodes_idx.size() > 1) {
@@ -206,7 +208,7 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 			auto c = cloud.points[points_idx[i]];
 			
 			//std::cout << "Checing angle!\n";
-			if (!checkAngle(a, b, c, 155)) continue;
+			if (!checkAngle(a, b, c, 125)) continue;
 		}
 
 		points_to_return.push_back(points_idx[i]);
