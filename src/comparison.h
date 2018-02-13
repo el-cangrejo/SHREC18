@@ -245,5 +245,14 @@ int findClosestFeature(std::vector<pcl::SHOT352> &features,
 	return out_index;
 }
 
+void thresholdVector(std::vector<float> &v, float w) {
+	auto result = minmax_element(v.begin(), v.end());
+	float mean = w * (v[result.first - v.begin()] + 
+			v[result.second - v.begin()]);
 
+	for (int i = 0; i < v.size(); ++i) {
+		if (v[i] < mean) v[i] = 0;
+		else v[i] = 255;	
+	}
+}
 #endif  // COMPARISON_HPP
