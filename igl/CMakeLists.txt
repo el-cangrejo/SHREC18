@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 project(SHREC18)
 
-find_package(PCL 1.7 REQUIRED)
-list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
-include_directories(${PCL_INCLUDE_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+#find_package(PCL 2.7 REQUIRED)
+#list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+#include_directories(${PCL_INCLUDE_DIRS})
+#add_definitions(${PCL_DEFINITIONS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -32,5 +32,5 @@ find_package(LIBIGL REQUIRED QUIET)
 
 # Add your project files
 file(GLOB SRCFILES "src/*.cpp")
-add_executable(${PROJECT_NAME}_bin main.cpp)
+add_executable(${PROJECT_NAME}_bin ${SRCFILES})
 target_link_libraries(${PROJECT_NAME}_bin igl::core igl::viewer)
