@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
 
 	//std::vector<int> min_point{min_dist_point - target_distances.begin()};
 	std::vector<int> min_point;
-	for (int i = 0; i < 15; ++i) {
+	for (int i = 0; i < 5; ++i) {
 		min_point.push_back(std::get<0>(dist_idx[i]));
 	}
 
