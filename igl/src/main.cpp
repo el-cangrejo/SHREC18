@@ -15,15 +15,9 @@
 
 #include <iostream>
 
-//#include <pcl/features/boundary.h>
-//#include <pcl/features/principal_curvatures.h>
-//#include <pcl/keypoints/harris_3d.h>
-//#include <pcl/keypoints/iss_3d.h>
-
-//#include "comparison.h"
-//#include "helpers.hpp"
-//#include "viewer.hpp"
-float curvaturePercentageThreshold{0.6};
+float g_curvaturePercentageThreshold{0.6};
+bool g_writeCurvatures{true};
+bool g_binaryCurvatures{true};
 using namespace Eigen;
 
 bool init(igl::viewer::Viewer& viewer) {
@@ -59,8 +53,10 @@ bool init(igl::viewer::Viewer& viewer) {
 		}
 		viewer.core.align_camera_center(viewer.data.V, viewer.data.F);
 	});
+	viewer.ngui->addVariable("Write Curvatures", g_writeCurvatures);
+	viewer.ngui->addVariable("Binary Curvatures", g_binaryCurvatures);
 	viewer.ngui->addVariable("Curvature threshold",
-				 curvaturePercentageThreshold);
+				 g_curvaturePercentageThreshold);
 	viewer.screen->performLayout();
 	return false;
 }
@@ -84,25 +80,39 @@ VectorXd computeCurvature(const MatrixXd& V, const MatrixXi& F) {
 	// mean curvature
 	H = 0.5 * (PV1 + PV2);
 
-	auto maxValue = H.col(0).maxCoeff();
-	auto minValue = H.col(0).minCoeff();
-	std::cout << "maxvalue" << maxValue << std::endl;
-	std::cout << "minValue" << minValue << std::endl;
-	double threshold =
-	    curvaturePercentageThreshold * (maxValue - minValue) + minValue;
-	std::cout << "threshold" << threshold << std::endl;
-	for (int row = 0; row < H.rows(); row++) {
-		if (H(row, 0) < threshold)
-			H(row, 0) = 0;
-		else
-			H(row, 0) = 1;
+	if (g_binaryCurvatures) {
+		auto maxValue = H.col(0).maxCoeff();
+		auto minValue = H.col(0).minCoeff();
+		// std::cout << "maxvalue" << maxValue << std::endl;
+		// std::cout << "minValue" << minValue << std::endl;
+		double threshold =
+		    g_curvaturePercentageThreshold * (maxValue - minValue) +
+		    minValue;
+		// std::cout << "threshold" << threshold << std::endl;
+		for (int row = 0; row < H.rows(); row++) {
+			if (H(row, 0) < threshold)
+				H(row, 0) = 0;
+			else
+				H(row, 0) = 1;
+		}
 	}
 	return H;
+}
+
+void writeToFile(const VectorXd& v, std::string filename) {
+	std::ofstream out(filename + ".txt");
+	for (int row = 0; row < v.rows(); row++) {
+		out << v(row, 0) << "\n";
+	}
+	out.close();
 }
 
 bool key_down(igl::viewer::Viewer& viewer, unsigned char key, int mod) {
 	if (key == 'M') {
 		VectorXd H = computeCurvature(viewer.data.V, viewer.data.F);
+		if (g_writeCurvatures) {  // write to file
+			writeToFile(H, "curvatures");
+		}
 		MatrixXd C;
 		// Compute pseudocolor
 		igl::parula(H, true, C);
@@ -129,7 +139,6 @@ int main(int argc, char* argv[]) {
 	igl::viewer::Viewer viewer;
 	viewer.core.show_lines = false;
 	VectorXd H;
-	// computeMeanCurvature(V, F, H, viewer);
 
 	viewer.data.set_mesh(V, F);
 
