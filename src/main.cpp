@@ -59,31 +59,7 @@ int main(int argc, char **argv) {
 	std::vector<float> self_distances = selfFeatureDistance(features_q, idx);
 	thresholdVector(self_distances, atof(argv[6]));
 
-	std::cout << "Computing distances to target\n";
-	std::vector<float> target_distances = 
-		computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, features_q.points[idx]);
-	//thresholdVector(target_distances, atof(argv[6]));
-		
-	std::vector<std::tuple<int, float>> dist_idx;
-	for (int i = 0; i < target_distances.size(); ++i) {
-		dist_idx.push_back(std::make_tuple(i, target_distances[i]));
-	}
 
-	std::sort(std::begin(dist_idx), std::end(dist_idx), [](auto const &t1, auto const &t2) {
-					return std::get<1>(t1) < std::get<1>(t2); // or use a custom compare function
-	});
-	//auto min_dist_point = std::min_element(target_distances.begin(), target_distances.end());
-	//auto min_dist_point = std::min_element(target_distances.begin(), target_distances.end());
-
-	//std::vector<int> min_point{min_dist_point - target_distances.begin()};
-	std::vector<int> min_point;
-	for (int i = 0; i < 15; ++i) {
-		min_point.push_back(std::get<0>(dist_idx[i]));
-	}
-
-	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
-	createRGBCloud(cloud_t, target_distances, cloud_rgb);
-	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
 	std::vector<int> nodes_idx{idx};
 
 	int N = atoi(argv[5]);
@@ -107,5 +83,39 @@ int main(int argc, char **argv) {
 	for (auto i : nodes_idx)
 		std::cout << "Index of closest feature: " << i  << std::endl;
 
+	pcl::SHOT352 mean_feature = computeMeanFeature(features_q, nodes_idx);
+
+	for (int j = 0; j < 352; ++j) {
+		std::cout << mean_feature.descriptor[j] << "\n";
+	}
+
+	std::cout << "Computing distances to target\n";
+	std::vector<float> target_distances = 
+		//computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, features_q.points[idx]);
+		computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, mean_feature);
+	//thresholdVector(target_distances, atof(argv[6]));
+		
+	std::vector<std::tuple<int, float>> dist_idx;
+	for (int i = 0; i < target_distances.size(); ++i) {
+		dist_idx.push_back(std::make_tuple(i, target_distances[i]));
+	}
+
+	std::sort(std::begin(dist_idx), std::end(dist_idx), [](auto const &t1, auto const &t2) {
+					return std::get<1>(t1) < std::get<1>(t2); // or use a custom compare function
+	});
+	//auto min_dist_point = std::min_element(target_distances.begin(), target_distances.end());
+	//auto min_dist_point = std::min_element(target_distances.begin(), target_distances.end());
+
+	//std::vector<int> min_point{min_dist_point - target_distances.begin()};
+	std::vector<int> min_point;
+	for (int i = 0; i < 15; ++i) {
+		min_point.push_back(std::get<0>(dist_idx[i]));
+	}
+
+	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
+	createRGBCloud(cloud_t, target_distances, cloud_rgb);
+	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
+
 	enterViewerLoop(cloud_rgb, normals_t, min_point, .1);
 }
+

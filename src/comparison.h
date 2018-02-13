@@ -255,4 +255,21 @@ void thresholdVector(std::vector<float> &v, float w) {
 		else v[i] = 255;	
 	}
 }
+
+pcl::SHOT352 computeMeanFeature(pcl::PointCloud<pcl::SHOT352> features, std::vector<int> idxs) {
+	pcl::SHOT352 mean;
+	for (int j = 0; j < 352; ++j) {
+		mean.descriptor[j] = 0;
+	}
+	for (int i = 0; i < idxs.size(); ++i) {
+		for (int j = 0; j < 352; ++j) {
+			mean.descriptor[j] += features.points[idxs[i]].descriptor[j];
+		}
+	}
+	for (int j = 0; j < 352; ++j) {
+		mean.descriptor[j] /= idxs.size();
+	}
+	return mean;
+}
+
 #endif  // COMPARISON_HPP
