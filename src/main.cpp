@@ -83,16 +83,16 @@ int main(int argc, char **argv) {
 	for (auto i : nodes_idx)
 		std::cout << "Index of closest feature: " << i  << std::endl;
 
-	pcl::SHOT352 mean_feature = computeMeanFeature(features_q, nodes_idx);
+	//pcl::SHOT352 mean_feature = computeMeanFeature(features_q, nodes_idx);
 
-	for (int j = 0; j < 352; ++j) {
-		std::cout << mean_feature.descriptor[j] << "\n";
-	}
+	//for (int j = 0; j < 352; ++j) {
+	//	std::cout << mean_feature.descriptor[j] << "\n";
+	//}
 
 	std::cout << "Computing distances to target\n";
 	std::vector<float> target_distances = 
-		//computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, features_q.points[idx]);
-		computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, mean_feature);
+		computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, features_q.points[idx]);
+		//computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, mean_feature);
 	//thresholdVector(target_distances, atof(argv[6]));
 		
 	std::vector<std::tuple<int, float>> dist_idx;
