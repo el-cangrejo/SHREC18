@@ -9,16 +9,20 @@
 #include <igl/per_vertex_normals.h>
 #include <igl/principal_curvature.h>
 #include <igl/read_triangle_mesh.h>
+#include <igl/unproject_onto_mesh.h>
 #include <igl/viewer/Viewer.h>
 #include <nanogui/formhelper.h>
 #include <nanogui/screen.h>
 
 #include <iostream>
+using namespace Eigen;
 
 float g_curvaturePercentageThreshold{0.6};
 bool g_writeCurvatures{true};
 bool g_binaryCurvatures{true};
-using namespace Eigen;
+int g_selectedVertexIndex{0};
+bool g_pressedP{false};
+VectorXd g_curvatures;
 
 bool init(igl::viewer::Viewer& viewer) {
 	viewer.ngui->addButton("Load Mesh", [&]() {
@@ -27,6 +31,8 @@ bool init(igl::viewer::Viewer& viewer) {
 		if (fname.length() == 0) return;
 
 		std::string mesh_file_name_string = std::string(fname);
+		std::cout << "Mesh loaded:" << mesh_file_name_string
+			  << std::endl;
 		size_t last_dot = mesh_file_name_string.rfind('.');
 		if (last_dot == std::string::npos) {
 			printf("Error: No file extension found in %s\n",
@@ -57,6 +63,7 @@ bool init(igl::viewer::Viewer& viewer) {
 	viewer.ngui->addVariable("Binary Curvatures", g_binaryCurvatures);
 	viewer.ngui->addVariable("Curvature threshold",
 				 g_curvaturePercentageThreshold);
+	viewer.ngui->addVariable("Vertex Index", g_selectedVertexIndex);
 	viewer.screen->performLayout();
 	return false;
 }
@@ -110,6 +117,7 @@ void writeToFile(const VectorXd& v, std::string filename) {
 bool key_down(igl::viewer::Viewer& viewer, unsigned char key, int mod) {
 	if (key == 'M') {
 		VectorXd H = computeCurvature(viewer.data.V, viewer.data.F);
+		g_curvatures = H;
 		if (g_writeCurvatures) {  // write to file
 			writeToFile(H, "curvatures");
 		}
@@ -118,9 +126,53 @@ bool key_down(igl::viewer::Viewer& viewer, unsigned char key, int mod) {
 		igl::parula(H, true, C);
 		viewer.data.set_colors(C);
 		return true;
+	} else if (key == 'U') {
+		Eigen::MatrixXd point(1, 3);
+		point << viewer.data.V(g_selectedVertexIndex, 0),
+		    viewer.data.V(g_selectedVertexIndex, 1),
+		    viewer.data.V(g_selectedVertexIndex, 2);
+
+		viewer.data.set_points(point, Eigen::RowVector3d(1, 0, 0));
+	} else if (key == 'P') {
+		g_pressedP = true;
 	} else {
 		return false;
 	}
+}
+
+bool key_up(igl::viewer::Viewer& viewer, unsigned char key, int mod) {
+	if (key == 'P') {
+		g_pressedP = false;
+	} else {
+		return false;
+	}
+}
+
+bool mouse_down(igl::viewer::Viewer& viewer, int, int) {
+	if (g_pressedP) {
+		int fid;
+		Eigen::Vector3f bc;
+		const Eigen::MatrixXd& V = viewer.data.V;
+		const Eigen::MatrixXi& F = viewer.data.F;
+		MatrixXd C;
+		// Cast a ray in the view direction starting from the mouse
+		// position
+		double x = viewer.current_mouse_x;
+		double y = viewer.core.viewport(3) - viewer.current_mouse_y;
+		if (igl::unproject_onto_mesh(
+			Eigen::Vector2f(x, y),
+			viewer.core.view * viewer.core.model, viewer.core.proj,
+			viewer.core.viewport, V, F, fid, bc)) {
+			// paint hit red
+			igl::parula(g_curvatures, true, C);
+
+			C.row(F(fid)) << 1, 0, 0;
+			viewer.data.set_colors(C);
+			std::cout << "Vertex index:" << F(fid, 0) << std::endl;
+			return true;
+		}
+	}
+	return false;
 }
 
 int main(int argc, char* argv[]) {
@@ -143,6 +195,8 @@ int main(int argc, char* argv[]) {
 	viewer.data.set_mesh(V, F);
 
 	viewer.callback_key_down = &key_down;
+	viewer.callback_key_up = &key_up;
 	viewer.callback_init = &init;
+	viewer.callback_mouse_down = &mouse_down;
 	viewer.launch();
 }
