@@ -12,9 +12,6 @@
 int main(int argc, char **argv) {
 	std::cout << "Hello SHREC2018!\n";
 
-	//std::string queryModel = "shrec18_recognition/Dataset/" +
-	//			std::to_string(atoi(argv[1])) + ".ply";
-	//
 	std::string queryModel = "shrec18_recognition/Queries/" +
 				std::to_string(atoi(argv[1])) + ".ply";
 	pcl::PointCloud<pcl::PointXYZ> cloud_q;
@@ -26,7 +23,6 @@ int main(int argc, char **argv) {
 	pcl::PointCloud<pcl::PointXYZ> cloud_t;
 	pcl::PointCloud<pcl::Normal> normals_t;
 	pcl::PolygonMesh mesh_t;
-
 	
 	if (pcl::io::loadPLYFile(queryModel, mesh_q) == -1) {
 		return -1;
@@ -59,63 +55,37 @@ int main(int argc, char **argv) {
 	std::vector<float> self_distances = selfFeatureDistance(features_q, idx);
 	thresholdVector(self_distances, atof(argv[6]));
 
-
-	std::vector<int> nodes_idx{idx};
-
 	int N = atoi(argv[5]);
-	std::vector<int> indices_vec;
-	std::vector<int> checking_idxs;
-
-	for (int i = 0; i < N; i++) {
-		indices_vec = findIndices(cloud_q, inner_radius, outer_radius, nodes_idx, self_distances);
-		std::cout << "Found " << indices_vec.size()  << " in rep " << i << std::endl;
-		if (indices_vec.size() == 0) break;
-
-		auto features_vec = matchIndicesFeatures(indices_vec, features_q);
-		
-		int closestFeature_idx = findClosestFeature(features_vec, features_q[nodes_idx.back()]);
-		
-		nodes_idx.push_back(indices_vec[closestFeature_idx]);
-
-		checking_idxs.insert(checking_idxs.end(), indices_vec.begin(), indices_vec.end());
-	}
-
-	for (auto i : nodes_idx)
-		std::cout << "Index of closest feature: " << i  << std::endl;
-
+	std::vector<int> nodes_idx = createGraph(cloud_q, features_q, inner_radius, 
+			outer_radius, self_distances, idx);
+	
 	//pcl::SHOT352 mean_feature = computeMeanFeature(features_q, nodes_idx);
-
-	//for (int j = 0; j < 352; ++j) {
-	//	std::cout << mean_feature.descriptor[j] << "\n";
-	//}
 
 	std::cout << "Computing distances to target\n";
 	std::vector<float> target_distances = 
 		computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, features_q.points[idx]);
+	thresholdVector(target_distances, atof(argv[6]));
 		//computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, mean_feature);
 	//thresholdVector(target_distances, atof(argv[6]));
 		
-	std::vector<std::tuple<int, float>> dist_idx;
-	for (int i = 0; i < target_distances.size(); ++i) {
-		dist_idx.push_back(std::make_tuple(i, target_distances[i]));
-	}
+	std::vector<int> min_point = findPointsWithMinDist(target_distances, 15);
+	std::cout << "Min points" << min_point.size() << std::endl;
 
-	std::sort(std::begin(dist_idx), std::end(dist_idx), [](auto const &t1, auto const &t2) {
-					return std::get<1>(t1) < std::get<1>(t2); // or use a custom compare function
-	});
-	//auto min_dist_point = std::min_element(target_distances.begin(), target_distances.end());
-	//auto min_dist_point = std::min_element(target_distances.begin(), target_distances.end());
+	std::vector<int> target_graph;
 
-	//std::vector<int> min_point{min_dist_point - target_distances.begin()};
-	std::vector<int> min_point;
-	for (int i = 0; i < 5; ++i) {
-		min_point.push_back(std::get<0>(dist_idx[i]));
+	for (int i = 0; i < min_point.size(); ++i) {
+		std::cout << "Creating graph " << i << std::endl;
+		std::vector<int> temp_nodes = createGraph(cloud_t, features_t, inner_radius, 
+				outer_radius, target_distances, min_point[i]);
+		target_graph.insert(target_graph.end(), temp_nodes.begin(), temp_nodes.end());
 	}
 
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	createRGBCloud(cloud_t, target_distances, cloud_rgb);
+	//createRGBCloud(cloud_q, self_distances, cloud_rgb);
 	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
 
-	enterViewerLoop(cloud_rgb, normals_t, min_point, .1);
+	enterViewerLoop(cloud_rgb, normals_t, min_point, .05);
+	//enterViewerLoop(cloud_rgb, normals_t, target_graph, .05);
 }
 

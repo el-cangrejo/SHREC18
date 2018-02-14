@@ -272,4 +272,44 @@ pcl::SHOT352 computeMeanFeature(pcl::PointCloud<pcl::SHOT352> features, std::vec
 	return mean;
 }
 
+std::vector<int> createGraph(pcl::PointCloud<pcl::PointXYZ> cloud, pcl::PointCloud<pcl::SHOT352> features, float inner_radius, float outer_radius, std::vector<float> distances, int idx) {
+	std::vector<int> nodes_idx{idx};
+	std::vector<int> indices_vec;
+	std::vector<int> checking_idxs;
+
+	for (int i = 0; i < 5; ++i) {
+		indices_vec = findIndices(cloud, inner_radius, outer_radius, nodes_idx, distances);
+		std::cout << "Found " << indices_vec.size()  << " in rep " << i << std::endl;
+		if (indices_vec.size() == 0) break;
+
+		auto features_vec = matchIndicesFeatures(indices_vec, features);
+		int closestFeature_idx = findClosestFeature(features_vec, features[nodes_idx.back()]);
+		nodes_idx.push_back(indices_vec[closestFeature_idx]);
+		checking_idxs.insert(checking_idxs.end(), indices_vec.begin(), indices_vec.end());
+	}
+
+//	for (auto i : nodes_idx)
+//		std::cout << "Index of closest feature: " << i  << std::endl;
+
+	return nodes_idx;
+}
+
+std::vector<int> findPointsWithMinDist(std::vector<float> distances, int num_of_points) {
+	std::vector<int> min_point;
+
+	std::vector<std::tuple<int, float>> dist_idx;
+	for (int i = 0; i < distances.size(); ++i) {
+		dist_idx.push_back(std::make_tuple(i, distances[i]));
+	}
+
+	std::sort(std::begin(dist_idx), std::end(dist_idx), [](auto const &t1, auto const &t2) {
+					return std::get<1>(t1) < std::get<1>(t2); // or use a custom compare function
+	});
+
+	for (int i = 0; i < num_of_points; ++i) {
+		min_point.push_back(std::get<0>(dist_idx[i]));
+	}
+	return min_point;
+}
+
 #endif  // COMPARISON_HPP
