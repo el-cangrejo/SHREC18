@@ -208,7 +208,7 @@ std::vector<int> findIndices(pcl::PointCloud<pcl::PointXYZ> &cloud,
 			auto c = cloud.points[points_idx[i]];
 			
 			//std::cout << "Checing angle!\n";
-			if (!checkAngle(a, b, c, 125)) continue;
+			if (!checkAngle(a, b, c, 135)) continue;
 		}
 
 		points_to_return.push_back(points_idx[i]);
@@ -248,7 +248,7 @@ int findClosestFeature(std::vector<pcl::SHOT352> &features,
 void thresholdVector(std::vector<float> &v, float w) {
 	auto result = minmax_element(v.begin(), v.end());
 	float mean = w * (v[result.first - v.begin()] + 
-			v[result.second - v.begin()]);
+			v[result.second - v.begin()]) / 2.0;
 
 	for (int i = 0; i < v.size(); ++i) {
 		if (v[i] < mean) v[i] = 0;
@@ -277,9 +277,10 @@ std::vector<int> createGraph(pcl::PointCloud<pcl::PointXYZ> cloud, pcl::PointClo
 	std::vector<int> indices_vec;
 	std::vector<int> checking_idxs;
 
-	for (int i = 0; i < 5; ++i) {
+	//for (int i = 0; i < 5; ++i) {
+	while (1) {
 		indices_vec = findIndices(cloud, inner_radius, outer_radius, nodes_idx, distances);
-		std::cout << "Found " << indices_vec.size()  << " in rep " << i << std::endl;
+		//std::cout << "Found " << indices_vec.size()  << " in rep " << i << std::endl;
 		if (indices_vec.size() == 0) break;
 
 		auto features_vec = matchIndicesFeatures(indices_vec, features);

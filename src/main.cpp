@@ -56,19 +56,19 @@ int main(int argc, char **argv) {
 	thresholdVector(self_distances, atof(argv[6]));
 
 	int N = atoi(argv[5]);
-	std::vector<int> nodes_idx = createGraph(cloud_q, features_q, inner_radius, 
-			outer_radius, self_distances, idx);
+	std::vector<int> query_graph = createGraph(cloud_q, features_q, 0.06, 
+			0.15, self_distances, idx);
 	
-	//pcl::SHOT352 mean_feature = computeMeanFeature(features_q, nodes_idx);
+	pcl::SHOT352 mean_feature = computeMeanFeature(features_q, query_graph);
 
 	std::cout << "Computing distances to target\n";
 	std::vector<float> target_distances = 
 		computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, features_q.points[idx]);
-	thresholdVector(target_distances, atof(argv[6]));
 		//computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t, mean_feature);
+	thresholdVector(target_distances, atof(argv[6]));
 	//thresholdVector(target_distances, atof(argv[6]));
 		
-	std::vector<int> min_point = findPointsWithMinDist(target_distances, 15);
+	std::vector<int> min_point = findPointsWithMinDist(target_distances, atoi(argv[8]));
 	std::cout << "Min points" << min_point.size() << std::endl;
 
 	std::vector<int> target_graph;
@@ -85,7 +85,9 @@ int main(int argc, char **argv) {
 	//createRGBCloud(cloud_q, self_distances, cloud_rgb);
 	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
 
-	enterViewerLoop(cloud_rgb, normals_t, min_point, .05);
-	//enterViewerLoop(cloud_rgb, normals_t, target_graph, .05);
+	//enterViewerLoop(cloud_rgb, normals_t, min_point, .01);
+	enterViewerLoop(cloud_rgb, normals_t, target_graph, .05);
+	//enterViewerLoop(cloud_rgb, normals_q, query_graph, .05);
+	
 }
 
