@@ -295,22 +295,28 @@ std::vector<int> createGraph(pcl::PointCloud<pcl::PointXYZ> cloud, pcl::PointClo
 	return nodes_idx;
 }
 
-std::vector<int> findPointsWithMinDist(std::vector<float> distances, int num_of_points) {
-	std::vector<int> min_point;
+bool checkPoint(pcl::PointCloud<pcl::PointXYZ> cloud, int p, std::vector<int> graph) {
+	int sum = 0;
 
-	std::vector<std::tuple<int, float>> dist_idx;
+	for (int i = 0; i < graph.size(); ++i) {
+		float dist = pow(cloud.points[p].x - cloud.points[graph[i]].x, 2) + 
+					 pow(cloud.points[p].y - cloud.points[graph[i]].y, 2) + 
+					 pow(cloud.points[p].z - cloud.points[graph[i]].z, 2);
+
+		if (dist < pow(0.1, 2))
+			return false;
+	}
+
+	return true;
+}
+
+int findPointsWithMinDist(std::vector<std::tuple<int, float>> distances, std::vector<int> graph, pcl::PointCloud<pcl::PointXYZ> cloud) {
+
 	for (int i = 0; i < distances.size(); ++i) {
-		dist_idx.push_back(std::make_tuple(i, distances[i]));
+		if (checkPoint(cloud, std::get<0>(distances[i]), graph))
+			return std::get<0>(distances[i]);
 	}
-
-	std::sort(std::begin(dist_idx), std::end(dist_idx), [](auto const &t1, auto const &t2) {
-					return std::get<1>(t1) < std::get<1>(t2); // or use a custom compare function
-	});
-
-	for (int i = 0; i < num_of_points; ++i) {
-		min_point.push_back(std::get<0>(dist_idx[i]));
-	}
-	return min_point;
+	return -1;
 }
 
 #endif  // COMPARISON_HPP
