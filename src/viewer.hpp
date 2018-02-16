@@ -60,11 +60,11 @@ void enterViewerLoop(pcl::PointCloud<pcl::PointXYZRGB> &cloud,
 	//"normals");
 	viewer.addCoordinateSystem(1.0);
 	viewer.initCameraParameters();
-	viewer.addSphere(cloud[nodes[0]], sphereRadius, 0.0, 1.0, 0.0,
+	viewer.addSphere(cloud.points[nodes[0]], sphereRadius, 0.0, 1.0, 0.0,
 			 "sphere");
 	for (int i = 1; i < nodes.size(); i++) {
-		viewer.addSphere(cloud.points[nodes[i]], sphereRadius,
-				 0.0, 0.0, 1.0, "sphere" + std::to_string(i));
+		viewer.addSphere(cloud.points[nodes[i]], sphereRadius, 0.0, 0.0,
+				 1.0, "sphere" + std::to_string(i));
 	}
 	// for (int i = 1; i < pointIndices.size(); i++)
 	// viewer.addSphere(cloud[pointIndices[i]], sphereRadius, 1.0, 0.0, 1.0,

@@ -2,13 +2,9 @@
 #define HELPERS_HPP
 
 #include <pcl/PolygonMesh.h>
-#include <pcl/PolygonMesh.h>
 #include <pcl/Vertices.h>
 #include <pcl/common/centroid.h>
-#include <pcl/common/centroid.h>
 #include <pcl/conversions.h>
-#include <pcl/conversions.h>
-#include <pcl/features/shot.h>
 #include <pcl/features/shot.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
@@ -117,8 +113,22 @@ float computeAngle(Eigen::Vector3d a, Eigen::Vector3d b) {
 	float dp = a.dot(b);
 	float length_a = std::sqrt(a.dot(a));
 	float length_b = std::sqrt(b.dot(b));
-	float angle_rad = std::acos(dp / (length_a * length_b));
-	//std::cout << "Angle " << angle_rad << "\n";
+	float cosine = dp / (length_a * length_b);
+	float angle_rad = std::acos(cosine);
+
+	return angle_rad * 180 / M_PI;
+}
+
+float computeSignedAngle(Eigen::Vector3d a, Eigen::Vector3d b,
+			 Eigen::Vector3d plane_normal) {
+	a.normalize();
+	b.normalize();
+	float dp = a.dot(b);
+	float angle_rad = std::acos(dp);
+	Eigen::Vector3d cp = a.cross(b);
+
+	if (plane_normal.dot(cp) < 0) angle_rad = 2 * M_PI - angle_rad;
+
 	return angle_rad * 180 / M_PI;
 }
 #endif  // HELPERS_HPP
