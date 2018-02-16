@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 
 	int N = atoi(argv[5]);
 	std::vector<int> query_graph =
-	    createGraph(cloud_q, features_q, 0.06, 0.15, self_distances, idx);
+	    createGraph(cloud_q, features_q, 0.06, 0.12, self_distances, idx);
 
 	pcl::SHOT352 mean_feature = computeMeanFeature(features_q, query_graph);
 
@@ -71,21 +71,33 @@ int main(int argc, char **argv) {
 	// computeFeatureDistancesFromTargetModel<pcl::SHOT352>(features_t,
 	// mean_feature);
 	thresholdVector(target_distances, atof(argv[6]));
-	// thresholdVector(target_distances, atof(argv[6]));
-
-	std::vector<int> min_point =
-	    findPointsWithMinDist(target_distances, atoi(argv[8]));
-	std::cout << "Min points" << min_point.size() << std::endl;
 
 	std::vector<int> target_graph;
+	std::vector<std::vector<int>> target_graph_vis;
 
-	for (int i = 0; i < min_point.size(); ++i) {
+	std::vector<std::tuple<int, float>> dist_idx;
+	for (int i = 0; i < target_distances.size(); ++i) {
+		dist_idx.push_back(std::make_tuple(i, target_distances[i]));
+	}
+
+	std::sort(std::begin(dist_idx), std::end(dist_idx), [](auto const &t1,
+							       auto const &t2) {
+		return std::get<1>(t1) <
+		       std::get<1>(t2);  // or use a custom compare function
+	});
+
+	for (int i = 0; i < atoi(argv[8]); ++i) {
+		int min_point =
+		    findPointsWithMinDist(dist_idx, target_graph, cloud_t);
+
 		std::cout << "Creating graph " << i << std::endl;
 		std::vector<int> temp_nodes =
 		    createGraph(cloud_t, features_t, inner_radius, outer_radius,
-				target_distances, min_point[i]);
+				target_distances, min_point);
+
 		target_graph.insert(target_graph.end(), temp_nodes.begin(),
 				    temp_nodes.end());
+		target_graph_vis.push_back(temp_nodes);
 	}
 
 	centerCloud<pcl::PointXYZ>(cloud_t);  // rgb cloud will also be centered
@@ -110,9 +122,10 @@ int main(int argc, char **argv) {
 	// centerCloud<pcl::PointXYZRGB>(cloud_rgb);
 	createRGBCloud(cloud_t, target_distances, cloud_rgb);
 	// createRGBCloud(cloud_q, self_distances, cloud_rgb);
+	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
+	centerCloud<pcl::PointXYZ>(cloud_t);
 
 	// enterViewerLoop(cloud_rgb, normals_t, min_point, .01);
-	// enterViewerLoop(cloud_rgb, normals_t, target_graph, .06);
-	// enterViewerLoop(cloud_rgb, normals_t, node_positions, .05);
+	enterViewerLoop(mesh_t, cloud_t, normals_t, target_graph_vis, .05);
 	// enterViewerLoop(cloud_rgb, normals_q, query_graph, .05);
 }
