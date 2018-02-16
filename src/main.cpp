@@ -96,10 +96,11 @@ int main(int argc, char **argv) {
 		std::vector<int> temp_nodes =
 		    createGraph(cloud_t, features_t, inner_radius, outer_radius,
 				target_distances, min_point);
-		if (temp_nodes.size() < 15) continue;
 
+		std::cout << "Graph found with " << temp_nodes.size() << "\n";
 		target_graph.insert(target_graph.end(), temp_nodes.begin(),
 				    temp_nodes.end());
+		if (temp_nodes.size() < 15) continue;
 		target_graph_vis.push_back(temp_nodes);
 	}
 
