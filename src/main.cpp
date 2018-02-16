@@ -104,6 +104,7 @@ int main(int argc, char **argv) {
 
 	centerCloud<pcl::PointXYZ>(cloud_t);  // rgb cloud will also be centered
 
+	// compute querry histogram
 	int hist_size = 10;
 	std::vector<pcl::PointXYZ> node_positions =
 	    matchIndicesPositions(query_graph, cloud_t);
@@ -114,6 +115,7 @@ int main(int argc, char **argv) {
 
 	std::vector<float> hist_differences(target_graph_vis.size());
 
+	// populate hist_differences
 	for (int i = 0; i < target_graph_vis.size(); i++) {
 		const std::vector<int> &graph_t = target_graph_vis[i];
 		node_positions = matchIndicesPositions(graph_t, cloud_t);
