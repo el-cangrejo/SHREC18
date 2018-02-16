@@ -80,11 +80,13 @@ int main(int argc, char **argv) {
 		dist_idx.push_back(std::make_tuple(i, target_distances[i]));
 	}
 
-	std::sort(std::begin(dist_idx), std::end(dist_idx), [](auto const &t1,
-							       auto const &t2) {
-		return std::get<1>(t1) <
-		       std::get<1>(t2);  // or use a custom compare function
-	});
+	std::sort(
+	    std::begin(dist_idx), std::end(dist_idx),
+	    [](std::tuple<int, float> const &t1,
+	       std::tuple<int, float> const &t2) {
+		    return std::get<1>(t1) <
+			   std::get<1>(t2);  // or use a custom compare function
+	    });
 
 	for (int i = 0; i < atoi(argv[8]); ++i) {
 		int min_point =
@@ -102,21 +104,38 @@ int main(int argc, char **argv) {
 
 	centerCloud<pcl::PointXYZ>(cloud_t);  // rgb cloud will also be centered
 
+	int hist_size = 10;
 	std::vector<pcl::PointXYZ> node_positions =
-	    matchIndicesPositions(target_graph, cloud_t);
+	    matchIndicesPositions(query_graph, cloud_t);
 	std::vector<pcl::Normal> node_normals =
-	    matchIndicesNormals(target_graph, normals_t);
-	int hist_size = 360;
-	using Point = pcl::PointXYZ;
-	using Normal = pcl::Normal;
-	// std::vector<Normal> n{Normal(0, 0, 1), Normal(0, 0, 1), Normal(0, 0,
-	// 1),
-	//		      Normal(0, 0, 1), Normal(0, 0, 1)};
-	// std::vector<Point> v{Point(0, 1, 0), Point(1, 1, 0), Point(2, 2, 0),
-	//		     Point(3, 2, 0), Point(3, 3, 0)};
-	std::vector<float> angle_hist =
-	    // computeGraphHist(node_positions, hist_size);
+	    matchIndicesNormals(query_graph, normals_t);
+	std::vector<float> angle_hist_q =
 	    computeGraphHist(node_positions, node_normals, hist_size);
+
+	std::vector<float> hist_differences(target_graph_vis.size());
+
+	for (int i = 0; i < target_graph_vis.size(); i++) {
+		const std::vector<int> &graph_t = target_graph_vis[i];
+		node_positions = matchIndicesPositions(graph_t, cloud_t);
+		node_normals = matchIndicesNormals(graph_t, normals_t);
+		using Point = pcl::PointXYZ;
+		using Normal = pcl::Normal;
+		// std::vector<Normal> n{Normal(0, 0, 1), Normal(0, 0, 1),
+		// Normal(0, 0,
+		// 1),
+		//		      Normal(0, 0, 1), Normal(0, 0, 1)};
+		// std::vector<Point> v{Point(0, 1, 0), Point(1, 1, 0), Point(2,
+		// 2, 0),
+		//		     Point(3, 2, 0), Point(3, 3, 0)};
+		std::vector<float> angle_hist_t =
+		    // computeGraphHist(node_positions, hist_size);
+		    computeGraphHist(node_positions, node_normals, hist_size);
+
+		float hist_diff = computeHistDiff(angle_hist_q, angle_hist_t);
+		std::cout << "Graph with index " << i << " has diff "
+			  << hist_diff << std::endl;
+		hist_differences[i] = hist_diff;
+	}
 
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	// centerCloud<pcl::PointXYZRGB>(cloud_rgb);

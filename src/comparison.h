@@ -372,22 +372,22 @@ std::vector<float> computeGraphHist(std::vector<pcl::PointXYZ> positions,
 				   0);  // holds the votes for each angle
 	float binWidth = 360 / histogram_size;
 	for (int i = 1; i < positions.size() - 1; i++) {
-		std::cout << "\n";
-		std::cout << "Node index:" << i << std::endl;
+		// std::cout << "\n";
+		// std::cout << "Node index:" << i << std::endl;
 		pcl::PointXYZ a = positions[i - 1];
 		pcl::PointXYZ b = positions[i];
 		pcl::PointXYZ c = positions[i + 1];
-		std::cout << "a" << a << std::endl;
-		std::cout << "b" << b << std::endl;
-		std::cout << "c" << c << std::endl;
+		// std::cout << "a" << a << std::endl;
+		// std::cout << "b" << b << std::endl;
+		// std::cout << "c" << c << std::endl;
 		Eigen::Vector3d a_to_b(b.x - a.x, b.y - a.y, b.z - a.z);
 		Eigen::Vector3d b_to_c(c.x - b.x, c.y - b.y, c.z - b.z);
 		Eigen::Vector3d n(normals[i].normal_x, normals[i].normal_y,
 				  normals[i].normal_z);
 		float angle = computeSignedAngle(a_to_b, b_to_c, n);
-		std::cout << "angle:" << angle << std::endl;
+		// std::cout << "angle:" << angle << std::endl;
 		int bin_index = angle / binWidth;
-		std::cout << "bin index:" << bin_index << std::endl;
+		// std::cout << "bin index:" << bin_index << std::endl;
 		vote_hist[bin_index]++;
 	}
 
@@ -397,12 +397,17 @@ std::vector<float> computeGraphHist(std::vector<pcl::PointXYZ> positions,
 			       return bin_votes / float(positions.size() - 2);
 		       });
 
-	float sum = 0;
-	for (auto value : normalized_hist) {
-		sum += value;
-		// std::cout << value << std::endl;
-	}
 	// std::cout << sum << std::endl;
 	return normalized_hist;
+}
+
+float computeHistDiff(std::vector<float> h1, std::vector<float> h2) {
+	assert(h1.size() == h2.size());
+
+	float output = 0;
+	for (int i = 0; i < h1.size(); i++) {
+		output = std::pow(h1[i] - h2[i], 2);
+	}
+	return output;
 }
 #endif  // COMPARISON_HPP
