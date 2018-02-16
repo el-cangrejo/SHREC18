@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 
 	int N = atoi(argv[5]);
 	std::vector<int> query_graph = createGraph(cloud_q, features_q, 0.06, 
-			0.15, self_distances, idx);
+			0.12, self_distances, idx);
 	
 	pcl::SHOT352 mean_feature = computeMeanFeature(features_q, query_graph);
 
@@ -70,6 +70,7 @@ int main(int argc, char **argv) {
 		
 
 	std::vector<int> target_graph;
+	std::vector<std::vector<int>> target_graph_vis;
 
 	std::vector<std::tuple<int, float>> dist_idx;
 	for (int i = 0; i < target_distances.size(); ++i) {
@@ -89,15 +90,17 @@ int main(int argc, char **argv) {
 				outer_radius, target_distances, min_point);
 
 		target_graph.insert(target_graph.end(), temp_nodes.begin(), temp_nodes.end());
+		target_graph_vis.push_back(temp_nodes);
 	}
 
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	createRGBCloud(cloud_t, target_distances, cloud_rgb);
 	//createRGBCloud(cloud_q, self_distances, cloud_rgb);
 	centerCloud<pcl::PointXYZRGB>(cloud_rgb);
+	centerCloud<pcl::PointXYZ>(cloud_t);
 
 	//enterViewerLoop(cloud_rgb, normals_t, min_point, .01);
-	enterViewerLoop(cloud_rgb, normals_t, target_graph, .05);
+	enterViewerLoop(mesh_t, cloud_t, normals_t, target_graph_vis, .05);
 	//enterViewerLoop(cloud_rgb, normals_q, query_graph, .05);
 	
 }

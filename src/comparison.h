@@ -303,7 +303,7 @@ bool checkPoint(pcl::PointCloud<pcl::PointXYZ> cloud, int p, std::vector<int> gr
 					 pow(cloud.points[p].y - cloud.points[graph[i]].y, 2) + 
 					 pow(cloud.points[p].z - cloud.points[graph[i]].z, 2);
 
-		if (dist < pow(0.1, 2))
+		if (dist < pow(0.5, 2))
 			return false;
 	}
 
