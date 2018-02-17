@@ -123,8 +123,8 @@ int main(int argc, char **argv) {
 		const std::vector<int> &graph_t = target_graph_vis[i];
 		node_positions = matchIndicesPositions(graph_t, cloud_t);
 		node_normals = matchIndicesNormals(graph_t, normals_t);
-		using Point = pcl::PointXYZ;
-		using Normal = pcl::Normal;
+		// using Point = pcl::PointXYZ;
+		// using Normal = pcl::Normal;
 		// std::vector<Normal> n{Normal(0, 0, 1), Normal(0, 0, 1),
 		// Normal(0, 0,
 		// 1),
@@ -149,12 +149,18 @@ int main(int argc, char **argv) {
 		    return std::get<1>(t1) <
 			   std::get<1>(t2);  // or use a custom compare function
 	    });
+	std::vector<std::vector<int>> closest_graphs_vis;
+	for (int i = 0; i < std::min(hist_differences.size(), 4); i++) {
+		closest_graphs_vis.push_back(
+		    target_graph_vis[std::get<0>(hist_differences[i])]);
+	}
+	std::cout << "closest_graphs_vis.size()=" << closest_graphs_vis.size()
+		  << std::endl;
 	// std::vector<std::vector<int>> closest_graphs_vis(
 	//    {target_graph_vis[std::get<0>(hist_differences[0])],
 	//     target_graph_vis[std::get<0>(hist_differences[1])],
 	//     target_graph_vis[std::get<0>(hist_differences[2])]});
-	std::vector<std::vector<int>> closest_graphs_vis(
-	    {target_graph_vis[std::get<0>(hist_differences[0])]});
+
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	// centerCloud<pcl::PointXYZRGB>(cloud_rgb);
 	createRGBCloud(cloud_t, target_distances, cloud_rgb);
