@@ -150,7 +150,8 @@ int main(int argc, char **argv) {
 			   std::get<1>(t2);  // or use a custom compare function
 	    });
 	std::vector<std::vector<int>> closest_graphs_vis;
-	for (int i = 0; i < std::min(hist_differences.size(), 4); i++) {
+	assert(hist_differences.size() >= 3);
+	for (int i = 0; i < 3; i++) {
 		closest_graphs_vis.push_back(
 		    target_graph_vis[std::get<0>(hist_differences[i])]);
 	}
