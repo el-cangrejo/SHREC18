@@ -113,7 +113,8 @@ int main(int argc, char **argv) {
 	std::vector<float> angle_hist_q =
 	    computeGraphHist(node_positions, node_normals, hist_size);
 
-	std::vector<float> hist_differences(target_graph_vis.size());
+	std::vector<std::tuple<int, float>> hist_differences(
+	    target_graph_vis.size());
 
 	// populate hist_differences
 	for (int i = 0; i < target_graph_vis.size(); i++) {
@@ -136,9 +137,20 @@ int main(int argc, char **argv) {
 		float hist_diff = computeHistDiff(angle_hist_q, angle_hist_t);
 		std::cout << "Graph with index " << i << " has diff "
 			  << hist_diff << std::endl;
-		hist_differences[i] = hist_diff;
+		hist_differences[i] = std::make_tuple(i, hist_diff);
 	}
 
+	std::sort(
+	    std::begin(hist_differences), std::end(hist_differences),
+	    [](std::tuple<int, float> const &t1,
+	       std::tuple<int, float> const &t2) {
+		    return std::get<1>(t1) <
+			   std::get<1>(t2);  // or use a custom compare function
+	    });
+	std::vector<std::vector<int>> closest_graphs_vis(
+	    {target_graph_vis[std::get<0>(hist_differences[0])],
+	     target_graph_vis[std::get<0>(hist_differences[1])],
+	     target_graph_vis[std::get<0>(hist_differences[2])]});
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_rgb;
 	// centerCloud<pcl::PointXYZRGB>(cloud_rgb);
 	createRGBCloud(cloud_t, target_distances, cloud_rgb);
@@ -147,6 +159,6 @@ int main(int argc, char **argv) {
 	centerCloud<pcl::PointXYZ>(cloud_t);
 
 	// enterViewerLoop(cloud_rgb, normals_t, min_point, .01);
-	enterViewerLoop(mesh_t, cloud_t, normals_t, target_graph_vis, .05);
+	enterViewerLoop(mesh_t, cloud_t, normals_t, closest_graphs_vis, .05);
 	// enterViewerLoop(cloud_rgb, normals_q, query_graph, .05);
 }
