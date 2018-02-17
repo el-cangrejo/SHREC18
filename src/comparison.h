@@ -406,7 +406,7 @@ float computeHistDiff(std::vector<float> h1, std::vector<float> h2) {
 
 	float output = 0;
 	for (int i = 0; i < h1.size(); i++) {
-		output = std::pow(h1[i] - h2[i], 2);
+		output += std::pow(h1[i] - h2[i], 2);
 	}
 	return output;
 }
