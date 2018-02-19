@@ -10,6 +10,7 @@
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/search/impl/search.hpp>
+#include "comparison.h"
 
 void computeNormals(const pcl::PolygonMesh &mesh,
 		    pcl::PointCloud<pcl::PointXYZ> &cloud,
@@ -75,6 +76,35 @@ void centerCloud(pcl::PointCloud<T> &cloud) {
 		cloud.points[i].z = cloud.points[i].z - c.z;
 	}
 }
+struct Mesh {
+	pcl::PointCloud<pcl::PointXYZ> positions;
+	pcl::PointCloud<pcl::Normal> normals;
+	pcl::PolygonMesh mesh;
+	Mesh(pcl::PointCloud<pcl::PointXYZ> p, pcl::PointCloud<pcl::Normal> n,
+	     pcl::PolygonMesh m)
+	    : positions(p), normals(n), mesh(m) {}
+	Mesh() {}
+};
+
+Mesh load(std::string filename) {
+	Mesh output;
+
+	pcl::PolygonMesh mesh;
+	if (pcl::io::loadPLYFile(filename, mesh) == -1) {
+		std::cerr << "ERROR:Invalid file name " << filename
+			  << std::endl;
+		return Mesh();
+	}
+
+	pcl::PointCloud<pcl::PointXYZ> positions;
+	pcl::fromPCLPointCloud2(mesh.cloud, positions);
+	std::cout << "Query model : " << positions.points.size() << "\n";
+
+	pcl::PointCloud<pcl::Normal> normals;
+	computeNormals(mesh, positions, normals);
+
+	return Mesh(positions, normals, mesh);
+}
 
 void fitToUnitCloud(pcl::PointCloud<pcl::PointXYZ> &cloud) {
 	float max_dist = 0.0;
@@ -131,4 +161,5 @@ float computeSignedAngle(Eigen::Vector3d a, Eigen::Vector3d b,
 
 	return angle_rad * 180 / M_PI;
 }
+
 #endif  // HELPERS_HPP

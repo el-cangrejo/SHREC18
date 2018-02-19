@@ -23,14 +23,6 @@ PCL_INSTANTIATE(Search, PCL_POINT_TYPES)
 #endif  // PCL_NO_PRECOMPILE
 #include "helpers.hpp"
 
-struct CloudWithNormals {
-	pcl::PointCloud<pcl::PointXYZ> cloudPositions;
-	pcl::PointCloud<pcl::Normal> cloudNormals;
-	template <typename CloudPositions, typename CloudNormals>
-	CloudWithNormals(CloudPositions p, CloudNormals n)
-	    : cloudPositions(p), cloudNormals(n) {}
-};
-
 template <typename F>
 float l2FeatureDistance(F first, F second) {
 	float dist = 0.0;
@@ -46,12 +38,12 @@ float l2FeatureDistance(pcl::SHOT352 first, pcl::SHOT352 second) {
 	return sqrt(dist);
 }
 
-pcl::PointCloud<pcl::PFHSignature125> computeFeaturesPFH(
-    const CloudWithNormals input, float searchRadius) {
+pcl::PointCloud<pcl::PFHSignature125> computeFeaturesPFH(const Mesh input,
+							 float searchRadius) {
 	pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::PFHSignature125>
 	    pfh;
-	pfh.setInputCloud(input.cloudPositions.makeShared());
-	pfh.setInputNormals(input.cloudNormals.makeShared());
+	pfh.setInputCloud(input.positions.makeShared());
+	pfh.setInputNormals(input.normals.makeShared());
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 	pfh.setSearchMethod(tree);
@@ -63,11 +55,11 @@ pcl::PointCloud<pcl::PFHSignature125> computeFeaturesPFH(
 }
 
 pcl::PointCloud<pcl::PFHSignature125> computePointFeaturesPFH(
-    const CloudWithNormals input, int idx, float searchRadius) {
+    const Mesh input, int idx, float searchRadius) {
 	pcl::PFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::PFHSignature125>
 	    pfh;
-	pfh.setInputCloud(input.cloudPositions.makeShared());
-	pfh.setInputNormals(input.cloudNormals.makeShared());
+	pfh.setInputCloud(input.positions.makeShared());
+	pfh.setInputNormals(input.normals.makeShared());
 	boost::shared_ptr<std::vector<int>> indicesptr(
 	    new std::vector<int>{idx});
 	pfh.setIndices(indicesptr);
@@ -83,12 +75,12 @@ pcl::PointCloud<pcl::PFHSignature125> computePointFeaturesPFH(
 	return outputFeatures;
 }
 
-pcl::PointCloud<pcl::FPFHSignature33> computeFeaturesFPFH(
-    const CloudWithNormals input, float searchRadius) {
+pcl::PointCloud<pcl::FPFHSignature33> computeFeaturesFPFH(const Mesh input,
+							  float searchRadius) {
 	pcl::FPFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::FPFHSignature33>
 	    fpfh;
-	fpfh.setInputCloud(input.cloudPositions.makeShared());
-	fpfh.setInputNormals(input.cloudNormals.makeShared());
+	fpfh.setInputCloud(input.positions.makeShared());
+	fpfh.setInputNormals(input.normals.makeShared());
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 	fpfh.setSearchMethod(tree);
@@ -98,8 +90,9 @@ pcl::PointCloud<pcl::FPFHSignature33> computeFeaturesFPFH(
 	return outputFeatures;
 }
 
-pcl::PointCloud<pcl::FPFHSignature33> computePointFeaturesFPFH(
-    const CloudWithNormals input, int idx, float radius) {
+pcl::PointCloud<pcl::FPFHSignature33> computePointFeaturesFPFH(const Mesh input,
+							       int idx,
+							       float radius) {
 	pcl::FPFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::FPFHSignature33>
 	    fpfh;
 	pcl::PointCloud<pcl::FPFHSignature33> fpfhs;
@@ -110,8 +103,8 @@ pcl::PointCloud<pcl::FPFHSignature33> computePointFeaturesFPFH(
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 
-	fpfh.setInputCloud(input.cloudPositions.makeShared());
-	fpfh.setInputNormals(input.cloudNormals.makeShared());
+	fpfh.setInputCloud(input.positions.makeShared());
+	fpfh.setInputNormals(input.normals.makeShared());
 	fpfh.setIndices(indicesptr);
 	fpfh.setSearchMethod(tree);
 	fpfh.setRadiusSearch(radius);
@@ -121,13 +114,13 @@ pcl::PointCloud<pcl::FPFHSignature33> computePointFeaturesFPFH(
 	return fpfhs;
 }
 
-pcl::PointCloud<pcl::SHOT352> computeFeaturesSHOT352(
-    const CloudWithNormals input, float searchRadius) {
+pcl::PointCloud<pcl::SHOT352> computeFeaturesSHOT352(const Mesh input,
+						     float searchRadius) {
 	pcl::SHOTEstimationOMP<pcl::PointXYZ, pcl::Normal, pcl::SHOT352> shot;
 	pcl::PointCloud<pcl::SHOT352> outputFeatures;
 
-	shot.setInputCloud(input.cloudPositions.makeShared());
-	shot.setInputNormals(input.cloudNormals.makeShared());
+	shot.setInputCloud(input.positions.makeShared());
+	shot.setInputNormals(input.normals.makeShared());
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
 	    new pcl::search::KdTree<pcl::PointXYZ>());
 	shot.setSearchMethod(tree);
@@ -410,4 +403,88 @@ float computeHistDiff(std::vector<float> h1, std::vector<float> h2) {
 	}
 	return output;
 }
+
+std::vector<int> computeQueryGraph(
+    const Mesh &M, const pcl::PointCloud<pcl::SHOT352> &features, int idx,
+    float inner_radius, float outer_radius,
+    float query_selfDistance_threshold) {
+	std::cout << "Computing self distances for query\n";
+	std::vector<float> self_distances = selfFeatureDistance(features, idx);
+	thresholdVector(self_distances, query_selfDistance_threshold);
+
+	return createGraph(M.positions, features, inner_radius, outer_radius,
+			   self_distances, idx);
+}
+
+std::vector<std::vector<int>> extractTargetGraphs(
+    const Mesh &target, std::vector<float> distances_from_query,
+    const pcl::PointCloud<pcl::SHOT352> &features_t, float inner_radius,
+    float outer_radius, int number_of_graphs, int min_nodes = 15) {
+	std::vector<std::vector<int>> target_graphs;  // output
+
+	std::vector<std::tuple<int, float>> dist_idx;
+	for (int i = 0; i < distances_from_query.size(); ++i) {
+		dist_idx.push_back(std::make_tuple(i, distances_from_query[i]));
+	}
+	std::sort(
+	    std::begin(dist_idx), std::end(dist_idx),
+	    [](std::tuple<int, float> const &t1,
+	       std::tuple<int, float> const &t2) {
+		    return std::get<1>(t1) <
+			   std::get<1>(t2);  // or use a custom compare function
+
+	    });
+
+	std::vector<int> all_nodes_t;
+	for (int i = 0; i < number_of_graphs; ++i) {
+		int min_point = findPointsWithMinDist(dist_idx, all_nodes_t,
+						      target.positions);
+
+		std::cout << "Creating graph " << i << std::endl;
+		std::vector<int> temp_nodes =
+		    createGraph(target.positions, features_t, inner_radius,
+				outer_radius, distances_from_query, min_point);
+
+		std::cout << "Graph found with " << temp_nodes.size() << "\n";
+		all_nodes_t.insert(all_nodes_t.end(), temp_nodes.begin(),
+				   temp_nodes.end());
+		if (temp_nodes.size() < min_nodes) continue;
+		target_graphs.push_back(temp_nodes);
+	}
+	return target_graphs;
+}
+
+std::vector<std::pair<int, float>> computeSortedTargetGraphs(
+    const Mesh &query, const std::vector<int> &query_graph, const Mesh &target,
+    const std::vector<std::vector<int>> &target_graphs) {
+	int hist_size = 50;
+	std::vector<pcl::PointXYZ> node_positions =
+	    matchIndicesPositions(query_graph, target.positions);
+	std::vector<pcl::Normal> node_normals =
+	    matchIndicesNormals(query_graph, target.normals);
+	std::vector<float> angle_hist_q =
+	    computeGraphHist(node_positions, node_normals, hist_size);
+
+	std::vector<std::tuple<int, float>> hist_differences(
+	    target_graphs.size());
+	for (int i = 0; i < target_graphs.size(); i++) {
+		const std::vector<int> &graph_t = target_graphs[i];
+		node_positions =
+		    matchIndicesPositions(graph_t, target.positions);
+		node_normals = matchIndicesNormals(graph_t, target.normals);
+		std::vector<float> angle_hist_t =
+		    computeGraphHist(node_positions, node_normals, hist_size);
+		float hist_diff = computeHistDiff(angle_hist_q, angle_hist_t);
+		std::cout << "Graph with index " << i << " has diff "
+			  << hist_diff << std::endl;
+		hist_differences[i] = std::make_pair(i, hist_diff);
+	}
+	std::sort(std::begin(hist_differences), std::end(hist_differences),
+		  [](std::tuple<int, float> const &t1,
+		     std::tuple<int, float> const &t2) {
+			  return std::get<1>(t1) < std::get<1>(t2);
+
+		  });
+}
+
 #endif  // COMPARISON_HPP
